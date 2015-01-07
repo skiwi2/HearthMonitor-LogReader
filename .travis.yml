@@ -1,0 +1,28 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+before_install:
+  - chmod +x gradlew
+
+notifications:
+  webhooks:
+    urls:
+      - secure: "SrBVmGmLlu9VEgSst0yCB0edvrpSo4lw7w8KabayU4CYdSa4D4jqB8aT6/m3uPovvnmpCRnS8KvC332MVLoTWBKabMPwTMQYWxdzfAQ0ICEK6FJQ39rZ+cDy7QjCg3o1xhUa+JdB4fg3zHBHb4Xac6SQlsC2TkhY/tjnr/DKtjY="
+    on_success: always
+    on_failure: always
+    on_start: false
+
+deploy:
+  provider: releases
+  api-key:
+    secure: "NXCyMGBqjK4pSS0gy0LwovWI5aZ7MSFzjP0x292eFXJyMbC6q5hSpGsbB25xgTcGs5wZTf5Ecp6B1pwNzfjOJtDVkdpoXbzvhOFofWQukdTt9VpNqpSFiUXd4B9fIXJEnkSjT3rlrcfL0SkbgnecSfiD8mKPbkLnctyZ9CXRRkg="
+  file:
+    - "build/libs/hearthmonitor-logreader-0.1.jar"
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
+    #must remain on all_branches: true together with tags: true due to the following bug: https://github.com/travis-ci/travis-ci/issues/1675
+    #ideal situation would be to change it such that it only builds a release on the master branch on tag push
