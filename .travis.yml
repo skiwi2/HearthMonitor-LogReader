@@ -6,6 +6,12 @@ jdk:
 before_install:
   - chmod +x gradlew
 
+after_success:
+  - |
+      if [[ ($TRAVIS_BRANCH = "master" && $TRAVIS_TAG) || $TRAVIS_BRANCH = "develop" ]]; then
+        ./gradlew uploadArchives -PossrhUsername="$OSSRH_USERNAME" -PossrhPassword="$OSSRH_PASSWORD"
+      fi
+
 notifications:
   webhooks:
     urls:
@@ -26,3 +32,8 @@ deploy:
     all_branches: true
     #must remain on all_branches: true together with tags: true due to the following bug: https://github.com/travis-ci/travis-ci/issues/1675
     #ideal situation would be to change it such that it only builds a release on the master branch on tag push
+
+env:
+  global:
+    - secure: "jG4EM3zdCrU5Mxb38+ldLR+miF9qKyBvo4tEoh9NyncSVQ8lTuZ2fMcAYqUUB3Eb2W5gB3Kpzp/dXfKhTkpQk6P0ZVhFdYNwoTQKMM3hsBiZiAOqLsWWvRZE3rwbvJB+amGcCjDK/5O5eQQVyAdFtLOKOLQU8+SERVLvqpgULqw="
+    - secure: "g/OGeI2iIBdZhUoBabT/nOS3XCmd0MawDclAndBI+E2Zij9/rnA3x1g/BNYzFWmIeTEbJOUZFOqLfqhDHUz/PXcxzhJwBv84RIBduK8BfFkUX8oXelECi8D6PuIm6mEaFvqqz4u8zndW22x4Cevy/UQ17Zri2qURkazEArNlo4Q="

@@ -3,13 +3,38 @@ apply plugin: 'maven'
 
 sourceCompatibility = 1.8
 
-group = 'com.skiwi'
+group = 'com.github.skiwi2'
 version = '0.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/groups/public/'
+    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'com.github.skiwi2', name: 'hearthmonitor-logapi', version: '0.1-SNAPSHOT'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'HearthMonitor LogReader'
+                packaging 'jar'
+                description 'An utility library that can be used to read logs from HearthStone.'
+                url 'https://github.com/skiwi2/HearthMonitor-LogReader'
+            }
+        }
+    }
 }
