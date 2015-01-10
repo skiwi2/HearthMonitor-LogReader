@@ -13,6 +13,11 @@ public class NotReadableException extends Exception  {
 
     private final List<String> lines = new ArrayList<>();
 
+    /**
+     * Constructs a new NotReadableException instance.
+     *
+     * @param lines The lines that were not readable
+     */
     public NotReadableException(final List<String> lines) {
         this.lines.addAll(lines);
     }
