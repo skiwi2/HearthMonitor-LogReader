@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Can be extended to read lines from log files.
+ * Can be extended to read lines from a log source.
  *
  * @author Frank van Heeswijk
  */

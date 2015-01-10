@@ -3,7 +3,7 @@ package com.github.skiwi2.hearthmonitor.logreader;
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 
 /**
- * Used to read log entries from log files.
+ * Used to read log entries.
  *
  * @author Frank van Heeswijk
  */
