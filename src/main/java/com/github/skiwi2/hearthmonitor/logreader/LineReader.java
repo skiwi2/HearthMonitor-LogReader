@@ -1,19 +1,25 @@
 package com.github.skiwi2.hearthmonitor.logreader;
 
+import java.util.Optional;
+
 /**
  * Used to read lines from an input source.
  *
- * This functional interface differs from Supplier<String> in that it can throw a NoMoreInputException.
- *
  * @author Frank van Heeswijk
  */
-@FunctionalInterface
 public interface LineReader {
     /**
-     * Reads a line.
+     * Reads the next line.
      *
-     * @return  The read line.
+     * @return  The next line.
      * @throws NoMoreInputException If no more input could be obtained.
      */
     String readLine() throws NoMoreInputException;
+
+    /**
+     * Peeks into the next line if more input is present, meaning that the line is not being consumed from the input source.
+     *
+     * @return  The next line, if present.
+     */
+    Optional<String> peekLine();
 }
