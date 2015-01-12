@@ -134,7 +134,7 @@ public class AbstractLineLogReaderTest {
 
         private ListLineLogReader(final List<String> inputList) {
             Objects.requireNonNull(inputList, "inputList");
-            this.iterator = inputList.iterator();
+            this.iterator = new ArrayList<>(inputList).iterator();
         }
 
         @Override
