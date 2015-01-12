@@ -15,7 +15,8 @@ public final class LogLineUtils {
         throw new UnsupportedOperationException();
     }
 
-    /** Pattern that checks if a string matches the following:
+    /**
+     * Pattern that checks if a string matches the following:
      *   - starts with a [
      *   - followed by one or more word characters
      *   - followed by a ]
