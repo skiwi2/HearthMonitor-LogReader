@@ -16,20 +16,25 @@ public final class LogReaderUtils {
     }
 
     /**
-     * Creates a LogReader that can read log entries from a LineReader and a read condition.
+     * Creates a LogReader that can read log entries from an input string, a LineReader for the extra lines and a read condition.
      *
-     * The LogReader will attempt to read from the LineReader as long as the read condition is met using the supplied entry readers.
+     * The LogReader will attempt to read extra lines from the LineReader as long as the read condition is met using the supplied entry readers.
      *
-     * @param lineReader    The line reader
-     * @param readCondition The read condition
+     * Note: The input will always be included and not checked against the extra read condition.
+     *
+     * @param input The input line
+     * @param extraLineReader    The extra line reader
+     * @param extraReadCondition The extra read condition
      * @param entryReaders  The entry readers
-     * @return  A new LogReader that can read log entries from the LineReader and the read condition.
+     * @return  A new LogReader that can read log entries from the input string, the LineReader for th extra lines and the read condition.
      */
-    public static LogReader fromLineReader(final LineReader lineReader, final Predicate<String> readCondition, final Set<EntryReader> entryReaders) {
-        Objects.requireNonNull(lineReader, "lineReader");
-        Objects.requireNonNull(readCondition, "readCondition");
+    public static LogReader fromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<String> extraReadCondition, final Set<EntryReader> entryReaders) {
+        Objects.requireNonNull(extraLineReader, "extraLineReader");
+        Objects.requireNonNull(extraReadCondition, "extraReadCondition");
         Objects.requireNonNull(entryReaders, "entryReaders");
         return new AbstractLineLogReader() {
+            private boolean inputRead = false;
+
             @Override
             protected Set<EntryReader> entryReaders() {
                 return entryReaders;
@@ -37,9 +42,14 @@ public final class LogReaderUtils {
 
             @Override
             protected String readLineFromLog() throws NoMoreInputException {
-                Optional<String> peekLine = lineReader.peekLine();
-                if (peekLine.isPresent() && readCondition.test(peekLine.get())) {
-                    return lineReader.readLine();
+                if (!inputRead) {
+                    inputRead = true;
+                    return input;
+                }
+
+                Optional<String> peekLine = extraLineReader.peekLine();
+                if (peekLine.isPresent() && extraReadCondition.test(peekLine.get())) {
+                    return extraLineReader.readLine();
                 }
                 throw new NoMoreInputException();
             }
