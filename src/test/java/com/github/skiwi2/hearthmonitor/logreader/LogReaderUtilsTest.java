@@ -20,7 +20,7 @@ public class LogReaderUtilsTest {
     public void testFromInputAndExtraLineReader() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader("A", "B", "C", "random1", "random2");
         Set<EntryReader> entryReaders = new HashSet<>(Arrays.asList(new ALogEntryReader(), new BLogEntryReader(), new CLogEntryReader()));
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, string -> string.length() == 1, entryReaders);
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, entryReaders);
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
@@ -39,7 +39,7 @@ public class LogReaderUtilsTest {
     public void testFromInputAndExtraLineReaderFalseExtraReadCondition() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader("A", "B", "C");
         Set<EntryReader> entryReaders = new HashSet<>(Arrays.asList(new ALogEntryReader(), new BLogEntryReader(), new CLogEntryReader()));
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, string -> false, entryReaders);
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> false, entryReaders);
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
 
@@ -55,7 +55,7 @@ public class LogReaderUtilsTest {
     public void testFromInputAndExtraLineReaderNoExtraInput() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader();
         Set<EntryReader> entryReaders = new HashSet<>(Arrays.asList(new ALogEntryReader(), new BLogEntryReader(), new CLogEntryReader()));
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, string -> string.length() == 1, entryReaders);
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, entryReaders);
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
 
@@ -71,7 +71,7 @@ public class LogReaderUtilsTest {
     public void testFromInputAndExtraLineReaderInputNotReadable() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader();
         Set<EntryReader> entryReaders = new HashSet<>(Arrays.asList(new ALogEntryReader(), new BLogEntryReader(), new CLogEntryReader()));
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, string -> string.length() == 1, entryReaders);
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, line -> line.length() == 1, entryReaders);
 
         try {
             logReader.readEntry();
