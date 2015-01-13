@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -125,30 +124,9 @@ public class AbstractLineLogReaderTest {
         assertEquals(Arrays.asList("1", "2", "3", "4", "5"), ((InfiniteLogEntry)logEntry3).getContent());
     }
 
-    private abstract static class ListLineLogReader extends AbstractLineLogReader {
-        private final Iterator<String> iterator;
-
-        private ListLineLogReader(final String... inputList) {
-            this(Arrays.asList(inputList));
-        }
-
-        private ListLineLogReader(final List<String> inputList) {
-            Objects.requireNonNull(inputList, "inputList");
-            this.iterator = new ArrayList<>(inputList).iterator();
-        }
-
-        @Override
-        protected String readLineFromLog() throws NoMoreInputException {
-            if (!iterator.hasNext()) {
-                throw new NoMoreInputException();
-            }
-            return iterator.next();
-        }
-    }
-
-    private static class ABCListLineLogReader extends ListLineLogReader {
+    private static class ABCListLineLogReader extends AbstractListLogReader {
         private ABCListLineLogReader(final String... inputList) {
-            super(inputList);
+            this(Arrays.asList(inputList));
         }
 
         private ABCListLineLogReader(final List<String> inputList) {
@@ -213,9 +191,9 @@ public class AbstractLineLogReaderTest {
         }
     }
 
-    private static class EmptyListLineLogReader extends ListLineLogReader {
+    private static class EmptyListLineLogReader extends AbstractListLogReader {
         private EmptyListLineLogReader(final String... inputList) {
-            super(inputList);
+            this(Arrays.asList(inputList));
         }
 
         private EmptyListLineLogReader(final List<String> inputList) {
@@ -228,9 +206,9 @@ public class AbstractLineLogReaderTest {
         }
     }
 
-    private static class ABCPeekListLineLogReader extends ListLineLogReader {
+    private static class ABCPeekListLineLogReader extends AbstractListLogReader {
         private ABCPeekListLineLogReader(final String... inputList) {
-            super(inputList);
+            this(Arrays.asList(inputList));
         }
 
         private ABCPeekListLineLogReader(final List<String> inputList) {
@@ -293,9 +271,9 @@ public class AbstractLineLogReaderTest {
         }
     }
 
-    private static class InfiniteReadPeekListLineLogReader extends ListLineLogReader {
+    private static class InfiniteReadPeekListLineLogReader extends AbstractListLogReader {
         private InfiniteReadPeekListLineLogReader(final String... inputList) {
-            super(inputList);
+            this(Arrays.asList(inputList));
         }
 
         private InfiniteReadPeekListLineLogReader(final List<String> inputList) {
