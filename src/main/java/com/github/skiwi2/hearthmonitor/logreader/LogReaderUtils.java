@@ -26,7 +26,7 @@ public final class LogReaderUtils {
      * @param extraLineReader    The extra line reader
      * @param extraReadCondition The extra read condition
      * @param entryReaders  The entry readers
-     * @return  A new LogReader that can read log entries from the input string, the LineReader for th extra lines and the read condition.
+     * @return  A new LogReader that can read log entries from the input string, the LineReader for the extra lines and the read condition.
      */
     public static LogReader fromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<String> extraReadCondition, final Set<EntryReader> entryReaders) {
         Objects.requireNonNull(extraLineReader, "extraLineReader");
