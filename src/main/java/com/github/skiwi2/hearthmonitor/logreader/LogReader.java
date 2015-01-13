@@ -11,7 +11,9 @@ public interface LogReader {
     /**
      * Returns the next log entry.
      *
-     * If you get a NotReadableException, then you can recover the lines that could not be read by calling NotReadableException#lines.
+     * The NotReadableException has more information available.
+     * You can recover the lines that could not be read by calling NotReadableException#getLines.
+     * You can see which exceptions were thrown internally by calling NotReadableException#getOccurredExceptions.
      *
      * @return  The next log entry.
      * @throws NotReadableException If the log entry could not be read.

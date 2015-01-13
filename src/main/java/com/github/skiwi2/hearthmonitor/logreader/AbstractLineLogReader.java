@@ -21,6 +21,8 @@ public abstract class AbstractLineLogReader implements LogReader {
 
     @Override
     public LogEntry readEntry() throws NotReadableException, NoMoreInputException {
+        List<Exception> occurredExceptions = new ArrayList<>();
+
         String line = readLineFromLogAndSave();
         for (EntryReader entryReader : entryReaders) {
             if (!entryReader.isParsable(line)) {
@@ -41,8 +43,8 @@ public abstract class AbstractLineLogReader implements LogReader {
                     /**
                      * Returns the next line from the log file and saves it to the peeked lines list.
                      *
-                     * @return  The next line from the log file.
-                     * @throws  java.lang.NullPointerException  If line is null.
+                     * @return The next line from the log file.
+                     * @throws java.lang.NullPointerException If line is null.
                      */
                     private Optional<String> peekLineFromLog() {
                         try {
@@ -58,12 +60,13 @@ public abstract class AbstractLineLogReader implements LogReader {
                 linesInMemory.clear();
                 return result;
             } catch (NotParsableException | NoMoreInputException ex) {
+                occurredExceptions.add(ex);
                 //try next entry reader
             }
         }
         List<String> notReadableLines = new ArrayList<>(linesInMemory);
         linesInMemory.clear();
-        throw new NotReadableException(notReadableLines);
+        throw new NotReadableException(notReadableLines, occurredExceptions);
     }
 
     /**
