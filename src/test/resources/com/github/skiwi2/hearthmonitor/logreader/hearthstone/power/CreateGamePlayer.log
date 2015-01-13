@@ -1,0 +1,16 @@
+[Power] GameState.DebugPrintPower() -     Player EntityID=2 PlayerID=1 GameAccountId=[hi=144115198130930503 lo=27162067]
+[Power] GameState.DebugPrintPower() -         tag=TIMEOUT value=75
+[Power] GameState.DebugPrintPower() -         tag=PLAYSTATE value=PLAYING
+[Power] GameState.DebugPrintPower() -         tag=CURRENT_PLAYER value=1
+[Power] GameState.DebugPrintPower() -         tag=FIRST_PLAYER value=1
+[Power] GameState.DebugPrintPower() -         tag=HERO_ENTITY value=4
+[Power] GameState.DebugPrintPower() -         tag=MAXHANDSIZE value=10
+[Power] GameState.DebugPrintPower() -         tag=STARTHANDSIZE value=4
+[Power] GameState.DebugPrintPower() -         tag=PLAYER_ID value=1
+[Power] GameState.DebugPrintPower() -         tag=TEAM_ID value=1
+[Power] GameState.DebugPrintPower() -         tag=ZONE value=PLAY
+[Power] GameState.DebugPrintPower() -         tag=CONTROLLER value=1
+[Power] GameState.DebugPrintPower() -         tag=ENTITY_ID value=2
+[Power] GameState.DebugPrintPower() -         tag=MAXRESOURCES value=10
+[Power] GameState.DebugPrintPower() -         tag=CARDTYPE value=PLAYER
+[Power] GameState.DebugPrintPower() -         tag=NUM_TURNS_LEFT value=1

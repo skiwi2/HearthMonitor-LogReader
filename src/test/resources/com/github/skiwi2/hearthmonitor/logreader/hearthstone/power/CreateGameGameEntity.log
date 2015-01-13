@@ -1,0 +1,8 @@
+[Power] GameState.DebugPrintPower() -     GameEntity EntityID=1
+[Power] GameState.DebugPrintPower() -         tag=10 value=85
+[Power] GameState.DebugPrintPower() -         tag=TURN value=1
+[Power] GameState.DebugPrintPower() -         tag=ZONE value=PLAY
+[Power] GameState.DebugPrintPower() -         tag=ENTITY_ID value=1
+[Power] GameState.DebugPrintPower() -         tag=NEXT_STEP value=BEGIN_MULLIGAN
+[Power] GameState.DebugPrintPower() -         tag=CARDTYPE value=GAME
+[Power] GameState.DebugPrintPower() -         tag=STATE value=RUNNING
