@@ -1,6 +1,14 @@
 package com.github.skiwi2.hearthmonitor.logreader;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ABDEntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.DLogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.EmptyEntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.InfiniteLogEntry;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,7 +24,7 @@ import static org.junit.Assert.*;
 public class AbstractLineLogReaderTest {
     @Test
     public void testReadEntryExpectedEntries() throws NoMoreInputException, NotReadableException {
-        LogReader logReader = new ABCListLineLogReader("A", "B");
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new ABCEntryReaders());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
         assertEquals(BLogEntry.class, logReader.readEntry().getClass());
@@ -24,7 +32,7 @@ public class AbstractLineLogReaderTest {
 
     @Test(expected = NoMoreInputException.class)
     public void testReadEntryNoMoreEntries() throws NoMoreInputException, NotReadableException {
-        LogReader logReader = new ABCListLineLogReader("A", "B");
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new ABCEntryReaders());
 
         logReader.readEntry();
         logReader.readEntry();
@@ -33,7 +41,7 @@ public class AbstractLineLogReaderTest {
 
     @Test
     public void testReadEntryNoReadersAvailable() throws NoMoreInputException {
-        LogReader logReader = new EmptyListLineLogReader("A", "B");
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new EmptyEntryReaders());
 
         try {
             logReader.readEntry();
@@ -46,16 +54,16 @@ public class AbstractLineLogReaderTest {
 
     @Test
     public void testReadLogEntrySpanningMultipleLines() throws NoMoreInputException, NotReadableException {
-        LogReader logReader = new ABCListLineLogReader("A", "C", "1","2", "3", "B");
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "3", "B"), new ABDEntryReaders());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(CLogEntry.class, logReader.readEntry().getClass());
+        assertEquals(DLogEntry.class, logReader.readEntry().getClass());
         assertEquals(BLogEntry.class, logReader.readEntry().getClass());
     }
 
     @Test
     public void testReadLogEntrySpanningMultipleLinesLastEntryNotReadable() throws NoMoreInputException, NotReadableException {
-        LogReader logReader = new ABCListLineLogReader("A", "B", "C", "1","2");
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "D", "1","2"), new ABDEntryReaders());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
         assertEquals(BLogEntry.class, logReader.readEntry().getClass());
@@ -64,13 +72,13 @@ public class AbstractLineLogReaderTest {
             logReader.readEntry();
             fail();
         } catch (NotReadableException ex) {
-            assertEquals(Arrays.asList("C", "1", "2"), ex.getLines());
+            assertEquals(Arrays.asList("D", "1", "2"), ex.getLines());
         }
     }
 
     @Test
     public void testReadLogEntrySpanningMultipleLinesIncorrectInput() throws NoMoreInputException, NotReadableException {
-        LogReader logReader = new ABCListLineLogReader("A", "C", "1","2", "4", "B");
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "4", "B"), new ABDEntryReaders());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
 
@@ -78,7 +86,7 @@ public class AbstractLineLogReaderTest {
             logReader.readEntry();
             fail();
         } catch (NotReadableException ex) {
-            assertEquals(Arrays.asList("C", "1", "2", "4"), ex.getLines());
+            assertEquals(Arrays.asList("D", "1", "2", "4"), ex.getLines());
         }
 
         assertEquals(BLogEntry.class, logReader.readEntry().getClass());
@@ -86,7 +94,7 @@ public class AbstractLineLogReaderTest {
 
     @Test
     public void testReadLogEntryWithPeekingEntryReaders() throws NoMoreInputException, NotReadableException {
-        LogReader logReader = new ABCPeekListLineLogReader("A", "A", "A", "B", "1", "B", "1", "C", "C", "B", "1", "A", "C");
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "A", "A", "B", "1", "B", "1", "C", "C", "B", "1", "A", "C"), new ABCPeekEntryReaders());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
@@ -109,7 +117,7 @@ public class AbstractLineLogReaderTest {
 
     @Test
     public void testReadLogEntryInfiniteLogEntries() throws NoMoreInputException, NotReadableException {
-        LogReader logReader = new InfiniteReadPeekListLineLogReader("START", "1", "2", "3", "START", "START", "1", "2", "3", "4", "5");
+        LogReader logReader = new ListLogReader(Arrays.asList("START", "1", "2", "3", "START", "START", "1", "2", "3", "4", "5"), new InfiniteReadPeekEntryReaders());
 
         LogEntry logEntry1 = logReader.readEntry();
         assertEquals(InfiniteLogEntry.class, logEntry1.getClass());
@@ -124,99 +132,9 @@ public class AbstractLineLogReaderTest {
         assertEquals(Arrays.asList("1", "2", "3", "4", "5"), ((InfiniteLogEntry)logEntry3).getContent());
     }
 
-    private static class ABCListLineLogReader extends AbstractListLogReader {
-        private ABCListLineLogReader(final String... inputList) {
-            this(Arrays.asList(inputList));
-        }
-
-        private ABCListLineLogReader(final List<String> inputList) {
-            super(inputList);
-        }
-
+    private static class ABCPeekEntryReaders implements EntryReaders {
         @Override
-        protected Set<EntryReader> entryReaders() {
-            return new HashSet<>(Arrays.asList(
-                new EntryReader() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("A");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
-                        if (!input.startsWith("A")) {
-                            throw new NotParsableException();
-                        }
-                        return new ALogEntry();
-                    }
-                },
-                new EntryReader() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("B");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
-                        if (!input.equals("B")) {
-                            throw new NotParsableException();
-                        }
-                        return new BLogEntry();
-                    }
-                },
-                new EntryReader() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("C");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
-                        if (!input.equals("C")) {
-                            throw new NotParsableException();
-                        }
-                        if (!Objects.equals("1", lineReader.readLine())) {
-                            throw new NotParsableException();
-                        }
-                        if (!Objects.equals("2", lineReader.readLine())) {
-                            throw new NotParsableException();
-                        }
-                        if (!Objects.equals("3", lineReader.readLine())) {
-                            throw new NotParsableException();
-                        }
-                        return new CLogEntry();
-                    }
-                }
-            ));
-        }
-    }
-
-    private static class EmptyListLineLogReader extends AbstractListLogReader {
-        private EmptyListLineLogReader(final String... inputList) {
-            this(Arrays.asList(inputList));
-        }
-
-        private EmptyListLineLogReader(final List<String> inputList) {
-            super(inputList);
-        }
-
-        @Override
-        protected Set<EntryReader> entryReaders() {
-            return new HashSet<>();
-        }
-    }
-
-    private static class ABCPeekListLineLogReader extends AbstractListLogReader {
-        private ABCPeekListLineLogReader(final String... inputList) {
-            this(Arrays.asList(inputList));
-        }
-
-        private ABCPeekListLineLogReader(final List<String> inputList) {
-            super(inputList);
-        }
-
-        @Override
-        protected Set<EntryReader> entryReaders() {
+        public Set<EntryReader> get() {
             return new HashSet<>(Arrays.asList(
                 new EntryReader() {
                     @Override
@@ -271,17 +189,9 @@ public class AbstractLineLogReaderTest {
         }
     }
 
-    private static class InfiniteReadPeekListLineLogReader extends AbstractListLogReader {
-        private InfiniteReadPeekListLineLogReader(final String... inputList) {
-            this(Arrays.asList(inputList));
-        }
-
-        private InfiniteReadPeekListLineLogReader(final List<String> inputList) {
-            super(inputList);
-        }
-
+    private static class InfiniteReadPeekEntryReaders implements EntryReaders {
         @Override
-        protected Set<EntryReader> entryReaders() {
+        public Set<EntryReader> get() {
             return new HashSet<>(Arrays.asList(
                 new EntryReader() {
                     @Override
@@ -305,25 +215,6 @@ public class AbstractLineLogReaderTest {
                     }
                 }
             ));
-        }
-    }
-
-    private static class ALogEntry implements LogEntry { }
-
-    private static class BLogEntry implements LogEntry { }
-
-    private static class CLogEntry implements LogEntry { }
-
-    private static class InfiniteLogEntry implements LogEntry {
-        private final List<String> content = new ArrayList<>();
-
-        private InfiniteLogEntry(final List<String> content) {
-            Objects.requireNonNull(content, "content");
-            this.content.addAll(content);
-        }
-
-        private List<String> getContent() {
-            return new ArrayList<>(content);
         }
     }
 }

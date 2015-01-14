@@ -15,9 +15,20 @@ import java.util.Set;
  * @author Frank van Heeswijk
  */
 public abstract class AbstractLineLogReader implements LogReader {
-    private final Set<EntryReader> entryReaders = entryReaders();
+    private final Set<EntryReader> entryReaders;
+
     private final List<String> linesInMemory = new ArrayList<>();
     private final List<String> peekedLines = new LinkedList<>();
+
+    /**
+     * Initializes an AbstractLineLogReader instance.
+     *
+     * @param entryReaders  The supplier of a set of entry readers
+     * @throws  java.lang.NullPointerException  If entryReaders.get() is null.
+     */
+    protected AbstractLineLogReader(final EntryReaders entryReaders) {
+        this.entryReaders = Objects.requireNonNull(entryReaders.get(), "entryReaders.get()");
+    }
 
     @Override
     public LogEntry readEntry() throws NotReadableException, NoMoreInputException {
@@ -68,13 +79,6 @@ public abstract class AbstractLineLogReader implements LogReader {
         linesInMemory.clear();
         throw new NotReadableException(notReadableLines, occurredExceptions);
     }
-
-    /**
-     * Returns the set of entry readers used to read the log files.
-     *
-     * @return  The set of entry readers used to read the log files.
-     */
-    protected abstract Set<EntryReader> entryReaders();
 
     /**
      * Returns the next line from the log file.

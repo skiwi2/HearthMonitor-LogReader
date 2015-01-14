@@ -1,6 +1,10 @@
 package com.github.skiwi2.hearthmonitor.logreader;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -12,17 +16,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
 
-public class AbstractMonitoringFileLogReaderTest {
+public class MonitoringFileLogReaderTest {
     @Test
     public void testReadEntry() throws InterruptedException {
         List<LogEntry> logEntries = Collections.synchronizedList(new ArrayList<>());
@@ -30,13 +31,16 @@ public class AbstractMonitoringFileLogReaderTest {
         AtomicReference<Exception> exceptionReference = new AtomicReference<>();
 
         Thread thread = new Thread(() -> {
-            try (CloseableLogReader logReader = new ABCMonitoringFileLogReader(Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8))) {
-                logEntries.add(logReader.readEntry());
-                logEntries.add(logReader.readEntry());
-                logEntries.add(logReader.readEntry());
-                logReader.readEntry();
-            } catch (NoMoreInputException ex) {
-                //ok
+            try {
+                BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryReaders())) {
+                    logEntries.add(logReader.readEntry());
+                    logEntries.add(logReader.readEntry());
+                    logEntries.add(logReader.readEntry());
+                    logReader.readEntry();
+                } catch (NoMoreInputException ex) {
+                    //ok
+                }
             } catch (Exception ex) {
                 exceptionReference.set(ex);
             }
@@ -72,13 +76,15 @@ public class AbstractMonitoringFileLogReaderTest {
         AtomicReference<Exception> exceptionReference = new AtomicReference<>();
 
         Thread thread = new Thread(() -> {
-            try (CloseableLogReader logReader = new ABCMonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8))) {
-                logReader.readEntry();
-                logReader.readEntry();
-                logReader.readEntry();
-                logReader.readEntry();
-            } catch (NoMoreInputException ex) {
-                noMoreInputExceptions.incrementAndGet();
+            try {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryReaders())) {
+                    logReader.readEntry();
+                    logReader.readEntry();
+                    logReader.readEntry();
+                    logReader.readEntry();
+                } catch (NoMoreInputException ex) {
+                    noMoreInputExceptions.incrementAndGet();
+                }
             } catch (Exception ex) {
                 exceptionReference.set(ex);
             }
@@ -113,14 +119,16 @@ public class AbstractMonitoringFileLogReaderTest {
         List<LogEntry> logEntries = Collections.synchronizedList(new ArrayList<>());
 
         Thread thread = new Thread(() -> {
-            try (CloseableLogReader logReader = new ABCMonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8))) {
-                logEntries.add(logReader.readEntry());
-                logEntries.add(logReader.readEntry());
-                logEntries.add(logReader.readEntry());
-                logEntries.add(logReader.readEntry());
-                logReader.readEntry();
-            } catch (NoMoreInputException ex) {
-                //ok
+            try {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryReaders())) {
+                    logEntries.add(logReader.readEntry());
+                    logEntries.add(logReader.readEntry());
+                    logEntries.add(logReader.readEntry());
+                    logEntries.add(logReader.readEntry());
+                    logReader.readEntry();
+                } catch (NoMoreInputException ex) {
+                    //ok
+                }
             } catch (Exception ex) {
                 exceptionReference.set(ex);
             }
@@ -147,64 +155,4 @@ public class AbstractMonitoringFileLogReaderTest {
 
         Files.delete(logFile);
     }
-
-    private static class ABCMonitoringFileLogReader extends AbstractMonitoringFileLogReader {
-        private ABCMonitoringFileLogReader(final BufferedReader bufferedReader) {
-            super(bufferedReader);
-        }
-
-        @Override
-        protected Set<EntryReader> entryReaders() {
-            return new HashSet<>(Arrays.asList(
-                new EntryReader() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("A");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
-                        if (!input.startsWith("A")) {
-                            throw new NotParsableException();
-                        }
-                        return new ALogEntry();
-                    }
-                },
-                new EntryReader() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("B");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
-                        if (!input.startsWith("B")) {
-                            throw new NotParsableException();
-                        }
-                        return new BLogEntry();
-                    }
-                },
-                new EntryReader() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("C");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
-                        if (!input.startsWith("C")) {
-                            throw new NotParsableException();
-                        }
-                        return new CLogEntry();
-                    }
-                }
-            ));
-        }
-    }
-
-    private static class ALogEntry implements LogEntry { }
-
-    private static class BLogEntry implements LogEntry { }
-
-    private static class CLogEntry implements LogEntry { }
 }

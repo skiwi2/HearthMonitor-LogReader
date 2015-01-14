@@ -5,20 +5,22 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Can be extended to read log entries from a log file.
+ * Used to read log entries from a log file.
  *
  * @author Frank van Heeswijk
  */
-public abstract class AbstractFileLogReader extends AbstractLineLogReader implements CloseableLogReader {
+public class FileLogReader extends AbstractLineLogReader implements CloseableLogReader {
     private final BufferedReader bufferedReader;
 
     /**
-     * Initializes an AbstractFileLogReader instance.
+     * Constructs a new FileLogReader instance.
      *
      * @param bufferedReader    The buffered reader from which to read
-     * @throws  java.lang.NullPointerException  If bufferedReader is null.
+     * @param entryReaders  The supplier of a set of entry readers
+     * @throws  java.lang.NullPointerException  If bufferedReader or entryReaders.get() is null.
      */
-    protected AbstractFileLogReader(final BufferedReader bufferedReader) {
+    public FileLogReader(final BufferedReader bufferedReader, final EntryReaders entryReaders) {
+        super(entryReaders);
         this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
     }
 

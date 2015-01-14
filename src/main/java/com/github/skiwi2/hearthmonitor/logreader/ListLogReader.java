@@ -6,22 +6,23 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Can be extended to read log entries from a list.
+ * Used to read log entries from a list.
  *
  * @author Frank van Heeswijk
  */
-public abstract class AbstractListLogReader extends AbstractLineLogReader {
+public class ListLogReader extends AbstractLineLogReader {
     private final Iterator<String> iterator;
 
     /**
-     * Initializes an AbstractListLogReader instance.
+     * Constructs a new ListLogReader instance.
      *
      * This method saves a snapshot of the list at this time, and uses that to iterate over.
      *
      * @param inputList The input list to read from
-     * @throws  java.lang.NullPointerException  If inputList is null.
+     * @throws  java.lang.NullPointerException  If inputList or entryReaders.get() is null.
      */
-    protected AbstractListLogReader(final List<String> inputList) {
+    public ListLogReader(final List<String> inputList, final EntryReaders entryReaders) {
+        super(entryReaders);
         Objects.requireNonNull(inputList, "inputList");
         this.iterator = new ArrayList<>(inputList).iterator();
     }

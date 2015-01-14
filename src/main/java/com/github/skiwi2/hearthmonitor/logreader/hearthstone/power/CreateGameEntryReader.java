@@ -80,7 +80,7 @@ public class CreateGameEntryReader implements EntryReader {
             lineReader.readLine(),
             lineReader,
             line -> true,
-            new HashSet<>(Arrays.asList(
+            () -> new HashSet<>(Arrays.asList(
                 new GameEntityEntryReader(),
                 new PlayerEntryReader()
             ))

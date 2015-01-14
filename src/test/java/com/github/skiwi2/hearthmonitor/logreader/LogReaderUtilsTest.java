@@ -1,17 +1,18 @@
 package com.github.skiwi2.hearthmonitor.logreader;
 
-import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -19,8 +20,7 @@ public class LogReaderUtilsTest {
     @Test
     public void testFromInputAndExtraLineReader() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader("A", "B", "C", "random1", "random2");
-        Set<EntryReader> entryReaders = new HashSet<>(Arrays.asList(new ALogEntryReader(), new BLogEntryReader(), new CLogEntryReader()));
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, entryReaders);
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, new ABCEntryReaders());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
@@ -38,8 +38,7 @@ public class LogReaderUtilsTest {
     @Test
     public void testFromInputAndExtraLineReaderFalseExtraReadCondition() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader("A", "B", "C");
-        Set<EntryReader> entryReaders = new HashSet<>(Arrays.asList(new ALogEntryReader(), new BLogEntryReader(), new CLogEntryReader()));
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> false, entryReaders);
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> false, new ABCEntryReaders());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
 
@@ -54,8 +53,7 @@ public class LogReaderUtilsTest {
     @Test
     public void testFromInputAndExtraLineReaderNoExtraInput() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader();
-        Set<EntryReader> entryReaders = new HashSet<>(Arrays.asList(new ALogEntryReader(), new BLogEntryReader(), new CLogEntryReader()));
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, entryReaders);
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, new ABCEntryReaders());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
 
@@ -70,8 +68,7 @@ public class LogReaderUtilsTest {
     @Test
     public void testFromInputAndExtraLineReaderInputNotReadable() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader();
-        Set<EntryReader> entryReaders = new HashSet<>(Arrays.asList(new ALogEntryReader(), new BLogEntryReader(), new CLogEntryReader()));
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, line -> line.length() == 1, entryReaders);
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, line -> line.length() == 1, new ABCEntryReaders());
 
         try {
             logReader.readEntry();
@@ -127,55 +124,4 @@ public class LogReaderUtilsTest {
             return Optional.of(peekIterator.next());
         }
     }
-
-    private static class ALogEntryReader implements EntryReader {
-        @Override
-        public boolean isParsable(final String input) {
-            return input.equals("A");
-        }
-
-        @Override
-        public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException, NoMoreInputException {
-            if (!input.equals("A")) {
-                throw new NotParsableException();
-            }
-            return new ALogEntry();
-        }
-    }
-
-    private static class BLogEntryReader implements EntryReader {
-        @Override
-        public boolean isParsable(final String input) {
-            return input.equals("B");
-        }
-
-        @Override
-        public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException, NoMoreInputException {
-            if (!input.equals("B")) {
-                throw new NotParsableException();
-            }
-            return new BLogEntry();
-        }
-    }
-
-    private static class CLogEntryReader implements EntryReader {
-        @Override
-        public boolean isParsable(final String input) {
-            return input.equals("C");
-        }
-
-        @Override
-        public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException, NoMoreInputException {
-            if (!input.equals("C")) {
-                throw new NotParsableException();
-            }
-            return new CLogEntry();
-        }
-    }
-
-    private static class ALogEntry implements LogEntry { }
-
-    private static class BLogEntry implements LogEntry { }
-
-    private static class CLogEntry implements LogEntry { }
 }
