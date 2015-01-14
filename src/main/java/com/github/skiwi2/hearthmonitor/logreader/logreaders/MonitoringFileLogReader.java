@@ -1,4 +1,9 @@
-package com.github.skiwi2.hearthmonitor.logreader;
+package com.github.skiwi2.hearthmonitor.logreader.logreaders;
+
+import com.github.skiwi2.hearthmonitor.logreader.AbstractLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.EntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,7 +35,7 @@ public class MonitoringFileLogReader extends AbstractLogReader implements Closea
      * This method will block until input is available, or an IOException or InterruptedException has occurred.
      *
      * @return  The next line from the log file.
-     * @throws NoMoreInputException If an underlying IOException or InterruptedException has been thrown.
+     * @throws com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException If an underlying IOException or InterruptedException has been thrown.
      */
     @Override
     protected String readLineFromLog() throws NoMoreInputException {

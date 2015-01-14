@@ -9,6 +9,7 @@ import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.DLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.EmptyEntryReaders;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.InfiniteLogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logreaders.ListLogReader;
 import org.junit.Test;
 
 import java.util.ArrayList;

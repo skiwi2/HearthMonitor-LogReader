@@ -4,7 +4,7 @@ import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.GameEntityLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.PlayerLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.FileLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.logreaders.FileLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.CreateGameEntryReader.GameEntityEntryReader;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.CreateGameEntryReader.PlayerEntryReader;
 import org.junit.Test;

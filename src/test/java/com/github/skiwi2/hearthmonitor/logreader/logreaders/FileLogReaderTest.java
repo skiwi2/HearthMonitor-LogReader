@@ -1,5 +1,7 @@
-package com.github.skiwi2.hearthmonitor.logreader;
+package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
+import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryReaders;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;

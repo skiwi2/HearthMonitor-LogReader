@@ -1,4 +1,8 @@
-package com.github.skiwi2.hearthmonitor.logreader;
+package com.github.skiwi2.hearthmonitor.logreader.logreaders;
+
+import com.github.skiwi2.hearthmonitor.logreader.AbstractLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.EntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
