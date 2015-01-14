@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  * @author Frank van Heeswijk
  */
-public class ListLogReader extends AbstractLineLogReader {
+public class ListLogReader extends AbstractLogReader {
     private final Iterator<String> iterator;
 
     /**

@@ -21,7 +21,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class AbstractLineLogReaderTest {
+public class AbstractLogReaderTest {
     @Test
     public void testReadEntryExpectedEntries() throws NoMoreInputException, NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new ABCEntryReaders());

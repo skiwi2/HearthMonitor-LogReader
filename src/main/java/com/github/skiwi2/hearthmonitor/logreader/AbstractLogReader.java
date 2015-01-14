@@ -14,19 +14,19 @@ import java.util.Set;
  *
  * @author Frank van Heeswijk
  */
-public abstract class AbstractLineLogReader implements LogReader {
+public abstract class AbstractLogReader implements LogReader {
     private final Set<EntryReader> entryReaders;
 
     private final List<String> linesInMemory = new ArrayList<>();
     private final List<String> peekedLines = new LinkedList<>();
 
     /**
-     * Initializes an AbstractLineLogReader instance.
+     * Initializes an AbstractLogReader instance.
      *
      * @param entryReaders  The supplier of a set of entry readers
      * @throws  java.lang.NullPointerException  If entryReaders.get() is null.
      */
-    protected AbstractLineLogReader(final EntryReaders entryReaders) {
+    protected AbstractLogReader(final EntryReaders entryReaders) {
         this.entryReaders = Objects.requireNonNull(entryReaders.get(), "entryReaders.get()");
     }
 

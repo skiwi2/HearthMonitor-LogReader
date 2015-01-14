@@ -31,7 +31,7 @@ public final class LogReaderUtils {
         Objects.requireNonNull(extraLineReader, "extraLineReader");
         Objects.requireNonNull(extraReadCondition, "extraReadCondition");
         Objects.requireNonNull(entryReaders, "entryReaders");
-        return new AbstractLineLogReader(entryReaders) {
+        return new AbstractLogReader(entryReaders) {
             private boolean inputRead = false;
 
             @Override

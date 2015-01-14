@@ -9,7 +9,7 @@ import java.util.Objects;
  *
  * @author Frank van Heeswijk
  */
-public class FileLogReader extends AbstractLineLogReader implements CloseableLogReader {
+public class FileLogReader extends AbstractLogReader implements CloseableLogReader {
     private final BufferedReader bufferedReader;
 
     /**
