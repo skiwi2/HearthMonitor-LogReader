@@ -5,7 +5,7 @@ import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.GameEntityLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.PlayerLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.PlayerLogEntry.GameAccountId;
-import com.github.skiwi2.hearthmonitor.logreader.EntryReader;
+import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 import com.github.skiwi2.hearthmonitor.logreader.LineReader;
 import com.github.skiwi2.hearthmonitor.logreader.LogReader;
 import com.github.skiwi2.hearthmonitor.logreader.LogReaderUtils;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  *
  * @author Frank van Heeswijk
  */
-public class CreateGameEntryReader implements EntryReader {
+public class CreateGameEntryParser implements EntryParser {
     /*
      * [Power] GameState.DebugPrintPower() - CREATE_GAME
      * [Power] GameState.DebugPrintPower() -     GameEntity EntityID=1
@@ -81,8 +81,8 @@ public class CreateGameEntryReader implements EntryReader {
             lineReader,
             line -> true,
             () -> new HashSet<>(Arrays.asList(
-                new GameEntityEntryReader(),
-                new PlayerEntryReader()
+                new GameEntityEntryParser(),
+                new PlayerEntryParser()
             ))
         );
 
@@ -109,7 +109,7 @@ public class CreateGameEntryReader implements EntryReader {
     /**
      * Used to parse [Power] CREATE_GAME - GameEntity entries.
      */
-    public static class GameEntityEntryReader implements EntryReader {
+    public static class GameEntityEntryParser implements EntryParser {
     /*
      * [Power] GameState.DebugPrintPower() -     GameEntity EntityID=1
      * [Power] GameState.DebugPrintPower() -         tag=10 value=85
@@ -180,7 +180,7 @@ public class CreateGameEntryReader implements EntryReader {
     /**
      * Used to parse [Power] CREATE_GAME - Player entries.
      */
-    public static class PlayerEntryReader implements EntryReader {
+    public static class PlayerEntryParser implements EntryParser {
         /*
          * [Power] GameState.DebugPrintPower() -     Player EntityID=2 PlayerID=1 GameAccountId=[hi=144115198130930503 lo=27162067]
          * [Power] GameState.DebugPrintPower() -         tag=TIMEOUT value=75

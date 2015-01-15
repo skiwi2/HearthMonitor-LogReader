@@ -1,8 +1,8 @@
 package com.github.skiwi2.hearthmonitor.logreader.logentries;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
-import com.github.skiwi2.hearthmonitor.logreader.EntryReader;
-import com.github.skiwi2.hearthmonitor.logreader.EntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
+import com.github.skiwi2.hearthmonitor.logreader.EntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.LineReader;
 import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
@@ -15,11 +15,11 @@ import java.util.Set;
 /**
  * @author Frank van Heeswijk
  */
-public class ABDEntryReaders implements EntryReaders {
+public class ABDEntryParsers implements EntryParsers {
     @Override
-    public Set<EntryReader> get() {
+    public Set<EntryParser> get() {
         return new HashSet<>(Arrays.asList(
-            new EntryReader() {
+            new EntryParser() {
                 @Override
                 public boolean isParsable(String input) {
                     return input.equals("A");
@@ -33,7 +33,7 @@ public class ABDEntryReaders implements EntryReaders {
                     return new ALogEntry();
                 }
             },
-            new EntryReader() {
+            new EntryParser() {
                 @Override
                 public boolean isParsable(String input) {
                     return input.equals("B");
@@ -47,7 +47,7 @@ public class ABDEntryReaders implements EntryReaders {
                     return new BLogEntry();
                 }
             },
-            new EntryReader() {
+            new EntryParser() {
                 @Override
                 public boolean isParsable(String input) {
                     return input.equals("D");

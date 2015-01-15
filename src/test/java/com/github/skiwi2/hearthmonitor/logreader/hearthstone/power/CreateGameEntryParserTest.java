@@ -5,8 +5,8 @@ import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.GameEntit
 import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.PlayerLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.logreaders.FileLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.CreateGameEntryReader.GameEntityEntryReader;
-import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.CreateGameEntryReader.PlayerEntryReader;
+import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.CreateGameEntryParser.GameEntityEntryParser;
+import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.CreateGameEntryParser.PlayerEntryParser;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -19,11 +19,11 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class CreateGameEntryReaderTest {
+public class CreateGameEntryParserTest {
     @Test
     public void testGameEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGameGameEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new GameEntityEntryReader())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new GameEntityEntryParser())))) {
             GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readEntry();
 
             assertEquals("1", gameEntityLogEntry.getEntityId());
@@ -41,7 +41,7 @@ public class CreateGameEntryReaderTest {
     @Test
     public void testPlayer() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGamePlayer.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new PlayerEntryReader())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new PlayerEntryParser())))) {
             PlayerLogEntry playerLogEntry = (PlayerLogEntry)logReader.readEntry();
 
             assertEquals("2", playerLogEntry.getEntityId());
@@ -70,7 +70,7 @@ public class CreateGameEntryReaderTest {
     @Test
     public void testCreateGame() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new CreateGameEntryReader())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
             CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readEntry();
 
             GameEntityLogEntry gameEntityLogEntry = createGameLogEntry.getGameEntityLogEntry();

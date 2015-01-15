@@ -2,7 +2,7 @@ package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
-import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
@@ -19,7 +19,7 @@ public class FileLogReaderTest {
     @Test
     public void testReadEntry() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryReaders())) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers())) {
             assertEquals(ALogEntry.class, logReader.readEntry().getClass());
             assertEquals(BLogEntry.class, logReader.readEntry().getClass());
             assertEquals(CLogEntry.class, logReader.readEntry().getClass());
@@ -29,7 +29,7 @@ public class FileLogReaderTest {
     @Test(expected = NoMoreInputException.class)
     public void testReadEntryNoMoreInput() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryReaders())) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers())) {
             logReader.readEntry();
             logReader.readEntry();
             logReader.readEntry();

@@ -1,6 +1,6 @@
 package com.github.skiwi2.hearthmonitor.logreader;
 
-import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
@@ -20,7 +20,7 @@ public class LogReaderUtilsTest {
     @Test
     public void testFromInputAndExtraLineReader() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader("A", "B", "C", "random1", "random2");
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, new ABCEntryReaders());
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, new ABCEntryParsers());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
@@ -38,7 +38,7 @@ public class LogReaderUtilsTest {
     @Test
     public void testFromInputAndExtraLineReaderFalseExtraReadCondition() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader("A", "B", "C");
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> false, new ABCEntryReaders());
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> false, new ABCEntryParsers());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
 
@@ -53,7 +53,7 @@ public class LogReaderUtilsTest {
     @Test
     public void testFromInputAndExtraLineReaderNoExtraInput() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader();
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, new ABCEntryReaders());
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, new ABCEntryParsers());
 
         assertEquals(ALogEntry.class, logReader.readEntry().getClass());
 
@@ -68,7 +68,7 @@ public class LogReaderUtilsTest {
     @Test
     public void testFromInputAndExtraLineReaderInputNotReadable() throws NoMoreInputException, NotReadableException {
         LineReader lineReader = new ListLineReader();
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, line -> line.length() == 1, new ABCEntryReaders());
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, line -> line.length() == 1, new ABCEntryParsers());
 
         try {
             logReader.readEntry();

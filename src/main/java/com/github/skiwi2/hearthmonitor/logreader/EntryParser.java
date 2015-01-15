@@ -3,18 +3,18 @@ package com.github.skiwi2.hearthmonitor.logreader;
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 
 /**
- * Used to read entries from a log source.
+ * Used to parse lines from a log source.
  *
- * It has the option to read more lines from the line reader if deemed necessary.
+ * It has the option to read more lines from the log source via a line reader if deemed necessary.
  *
  * @author Frank van Heeswijk
  */
-public interface EntryReader {
+public interface EntryParser {
     /**
-     * Returns whether this entry reader can parse the input.
+     * Returns whether this entry parser can parse the input.
      *
      * @param input The input check parsability for
-     * @return  Whether this entry reader can parse the input.
+     * @return  Whether this entry parser can parse the input.
      */
     boolean isParsable(final String input);
 

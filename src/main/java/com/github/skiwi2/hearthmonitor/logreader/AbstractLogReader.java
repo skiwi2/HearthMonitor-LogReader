@@ -15,7 +15,7 @@ import java.util.Set;
  * @author Frank van Heeswijk
  */
 public abstract class AbstractLogReader implements LogReader {
-    private final Set<EntryReader> entryReaders;
+    private final Set<EntryParser> entryParsers;
 
     private final List<String> linesInMemory = new ArrayList<>();
     private final List<String> peekedLines = new LinkedList<>();
@@ -23,11 +23,11 @@ public abstract class AbstractLogReader implements LogReader {
     /**
      * Initializes an AbstractLogReader instance.
      *
-     * @param entryReaders  The supplier of a set of entry readers
-     * @throws  java.lang.NullPointerException  If entryReaders.get() is null.
+     * @param entryParsers  The supplier of a set of entry parsers
+     * @throws  java.lang.NullPointerException  If entryParsers.get() is null.
      */
-    protected AbstractLogReader(final EntryReaders entryReaders) {
-        this.entryReaders = Objects.requireNonNull(entryReaders.get(), "entryReaders.get()");
+    protected AbstractLogReader(final EntryParsers entryParsers) {
+        this.entryParsers = Objects.requireNonNull(entryParsers.get(), "entryParsers.get()");
     }
 
     @Override
@@ -35,12 +35,12 @@ public abstract class AbstractLogReader implements LogReader {
         List<Exception> occurredExceptions = new ArrayList<>();
 
         String line = readLineFromLogAndSave();
-        for (EntryReader entryReader : entryReaders) {
-            if (!entryReader.isParsable(line)) {
+        for (EntryParser entryParser : entryParsers) {
+            if (!entryParser.isParsable(line)) {
                 continue;
             }
             try {
-                LogEntry result = entryReader.parse(line, new LineReader() {
+                LogEntry result = entryParser.parse(line, new LineReader() {
                     @Override
                     public String readLine() throws NoMoreInputException {
                         return readLineFromLogAndSave();
@@ -72,12 +72,12 @@ public abstract class AbstractLogReader implements LogReader {
                 return result;
             } catch (NotParsableException | NoMoreInputException ex) {
                 occurredExceptions.add(ex);
-                //try next entry reader
+                //try next entry parser
             }
         }
-        List<String> notReadableLines = new ArrayList<>(linesInMemory);
+        List<String> notParsableLines = new ArrayList<>(linesInMemory);
         linesInMemory.clear();
-        throw new NotReadableException(notReadableLines, occurredExceptions);
+        throw new NotReadableException(notParsableLines, occurredExceptions);
     }
 
     /**

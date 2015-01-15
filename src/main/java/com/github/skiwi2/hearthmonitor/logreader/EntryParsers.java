@@ -4,9 +4,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Functional interface to supply a set of entry readers.
+ * Functional interface to supply a set of entry parsers.
  *
  * @author Frank van Heeswijk
  */
 @FunctionalInterface
-public interface EntryReaders extends Supplier<Set<EntryReader>> { }
+public interface EntryParsers extends Supplier<Set<EntryParser>> { }

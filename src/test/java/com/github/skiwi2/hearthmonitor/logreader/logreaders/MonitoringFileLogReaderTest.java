@@ -3,7 +3,7 @@ package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
-import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
@@ -35,7 +35,7 @@ public class MonitoringFileLogReaderTest {
         Thread thread = new Thread(() -> {
             try {
                 BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
-                try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryReaders())) {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryParsers())) {
                     logEntries.add(logReader.readEntry());
                     logEntries.add(logReader.readEntry());
                     logEntries.add(logReader.readEntry());
@@ -79,7 +79,7 @@ public class MonitoringFileLogReaderTest {
 
         Thread thread = new Thread(() -> {
             try {
-                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryReaders())) {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryParsers())) {
                     logReader.readEntry();
                     logReader.readEntry();
                     logReader.readEntry();
@@ -122,7 +122,7 @@ public class MonitoringFileLogReaderTest {
 
         Thread thread = new Thread(() -> {
             try {
-                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryReaders())) {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryParsers())) {
                     logEntries.add(logReader.readEntry());
                     logEntries.add(logReader.readEntry());
                     logEntries.add(logReader.readEntry());

@@ -1,7 +1,7 @@
 package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
 import com.github.skiwi2.hearthmonitor.logreader.AbstractLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.EntryReaders;
+import com.github.skiwi2.hearthmonitor.logreader.EntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 
 import java.util.ArrayList;
@@ -23,10 +23,11 @@ public class ListLogReader extends AbstractLogReader {
      * This method saves a snapshot of the list at this time, and uses that to iterate over.
      *
      * @param inputList The input list to read from
-     * @throws  java.lang.NullPointerException  If inputList or entryReaders.get() is null.
+     * @param entryParsers  The supplier of a set of entry parsers
+     * @throws  java.lang.NullPointerException  If inputList or entryParsers.get() is null.
      */
-    public ListLogReader(final List<String> inputList, final EntryReaders entryReaders) {
-        super(entryReaders);
+    public ListLogReader(final List<String> inputList, final EntryParsers entryParsers) {
+        super(entryParsers);
         Objects.requireNonNull(inputList, "inputList");
         this.iterator = new ArrayList<>(inputList).iterator();
     }
