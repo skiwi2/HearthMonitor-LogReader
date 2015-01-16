@@ -12,7 +12,6 @@ import com.github.skiwi2.hearthmonitor.logreader.LogReaderUtils;
 import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
 import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
-import com.github.skiwi2.hearthmonitor.logreader.UncheckedNotParsableException;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.LogLineUtils;
 
 import java.util.Arrays;
@@ -158,25 +157,17 @@ public class CreateGameEntryParser implements EntryParser {
             String entityId = gameEntityMatcher.group(1);
             builder.entityId(entityId);
 
-            Predicate<String> readCondition = line -> {
-                try {
-                    return (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.getNumberOfSpaces(line) > 4);
-                } catch (NotParsableException ex) {
-                    throw new UncheckedNotParsableException(ex);
+            Predicate<String> readCondition = line -> (LogLineUtils.isFromNamedLogger(line) &&
+                (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > 4));
+
+            while (lineReader.nextLineMatches(readCondition)) {
+                Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
+                if (!tagValueMatcher.find()) {
+                    throw new NotParsableException();
                 }
-            };
-            try {
-                while (lineReader.nextLineMatches(readCondition)) {
-                    Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
-                    if (!tagValueMatcher.find()) {
-                        throw new NotParsableException();
-                    }
-                    String tag = tagValueMatcher.group(1);
-                    String value = tagValueMatcher.group(2);
-                    builder.addTagValuePair(tag, value);
-                }
-            } catch (UncheckedNotParsableException ex) {
-                throw (NotParsableException)ex.getCause();
+                String tag = tagValueMatcher.group(1);
+                String value = tagValueMatcher.group(2);
+                builder.addTagValuePair(tag, value);
             }
 
             return builder.build();
@@ -262,25 +253,17 @@ public class CreateGameEntryParser implements EntryParser {
             builder.playerId(playerId);
             builder.gameAccountId(gameAccountId);
 
-            Predicate<String> readCondition = line -> {
-                try {
-                    return (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.getNumberOfSpaces(line) > 4);
-                } catch (NotParsableException ex) {
-                    throw new UncheckedNotParsableException(ex);
+            Predicate<String> readCondition = line -> (LogLineUtils.isFromNamedLogger(line) &&
+                (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > 4));
+
+            while (lineReader.nextLineMatches(readCondition)) {
+                Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
+                if (!tagValueMatcher.find()) {
+                    throw new NotParsableException();
                 }
-            };
-            try {
-                while (lineReader.nextLineMatches(readCondition)) {
-                    Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
-                    if (!tagValueMatcher.find()) {
-                        throw new NotParsableException();
-                    }
-                    String tag = tagValueMatcher.group(1);
-                    String value = tagValueMatcher.group(2);
-                    builder.addTagValuePair(tag, value);
-                }
-            } catch (UncheckedNotParsableException ex) {
-                throw (NotParsableException)ex.getCause();
+                String tag = tagValueMatcher.group(1);
+                String value = tagValueMatcher.group(2);
+                builder.addTagValuePair(tag, value);
             }
 
             return builder.build();

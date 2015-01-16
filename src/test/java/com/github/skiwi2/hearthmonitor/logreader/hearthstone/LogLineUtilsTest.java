@@ -17,17 +17,22 @@ public class LogLineUtilsTest {
     }
 
     @Test
-    public void testGetNumberOfSpacesNoIndentation() throws NotParsableException {
-        assertEquals(0, LogLineUtils.getNumberOfSpaces("[Power] GameState.DebugPrintPower() - CREATE_GAME"));
+    public void testGetContentFromLineFromNamedLogger() {
+        assertEquals("Count=66", LogLineUtils.getContentFromLineFromNamedLogger("[Power] GameState.DebugPrintPowerList() - Count=66"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetContentFromLineFromNamedLoggerNotFromNamedLogger() {
+        LogLineUtils.getContentFromLineFromNamedLogger("Initialize engine version: 4.5.5p3 (b8dc95101aa8)");
     }
 
     @Test
-    public void testGetNumberOfSpacesWithIndentation() throws NotParsableException {
-        assertEquals(4, LogLineUtils.getNumberOfSpaces("[Power] GameState.DebugPrintPower() -     GameEntity EntityID=1"));
+    public void testCountLeadingSpacesNoIndentation() throws NotParsableException {
+        assertEquals(0, LogLineUtils.countLeadingSpaces("CREATE_GAME"));
     }
 
-    @Test(expected = NotParsableException.class)
-    public void testGetNumberOfSpacesIncorrectLogLine() throws NotParsableException {
-        LogLineUtils.getNumberOfSpaces("Initialize engine version: 4.5.5p3 (b8dc95101aa8)");
+    @Test
+    public void testCountLeadingSpacesWithIndentation() throws NotParsableException {
+        assertEquals(4, LogLineUtils.countLeadingSpaces("    GameEntity EntityID=1"));
     }
 }
