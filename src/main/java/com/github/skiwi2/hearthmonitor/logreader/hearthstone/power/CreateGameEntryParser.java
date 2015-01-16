@@ -74,7 +74,7 @@ public class CreateGameEntryParser implements EntryParser {
     }
 
     @Override
-    public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException, NoMoreInputException {
+    public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
         //construct a log reader from the line reader
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader(
             lineReader.readNextLine(),
@@ -101,7 +101,7 @@ public class CreateGameEntryParser implements EntryParser {
             }
 
             return builder.build();
-        } catch (NotReadableException ex) {
+        } catch (NotReadableException | NoMoreInputException ex) {
             throw new NotParsableException(ex);
         }
     }
@@ -147,7 +147,7 @@ public class CreateGameEntryParser implements EntryParser {
             Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(\\w+)" + Pattern.quote(" value=") + "(\\w+).*$");
 
         @Override
-        public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException, NoMoreInputException {
+        public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
             GameEntityLogEntry.Builder builder = new GameEntityLogEntry.Builder();
 
             Matcher gameEntityMatcher = EXTRACT_GAME_ENTITY_PATTERN.matcher(input);
@@ -232,7 +232,7 @@ public class CreateGameEntryParser implements EntryParser {
             Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(\\w+)" + Pattern.quote(" value=") + "(\\w+).*$");
 
         @Override
-        public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException, NoMoreInputException {
+        public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
             PlayerLogEntry.Builder builder = new PlayerLogEntry.Builder();
 
             Matcher playerMatcher = EXTRACT_PLAYER_PATTERN.matcher(input);

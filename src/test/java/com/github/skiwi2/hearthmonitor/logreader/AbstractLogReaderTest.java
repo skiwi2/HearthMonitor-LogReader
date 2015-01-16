@@ -143,7 +143,7 @@ public class AbstractLogReaderTest {
                     }
 
                     @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
+                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
                         if (!input.equals("A")) {
                             throw new NotParsableException();
                         }
@@ -158,7 +158,7 @@ public class AbstractLogReaderTest {
                     }
 
                     @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
+                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
                         if (!input.equals("B")) {
                             throw new NotParsableException();
                         }
@@ -176,7 +176,7 @@ public class AbstractLogReaderTest {
                     }
 
                     @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
+                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
                         if (!input.equals("C")) {
                             throw new NotParsableException();
                         }
@@ -199,7 +199,7 @@ public class AbstractLogReaderTest {
                     }
 
                     @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
+                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
                         if (!input.equals("START")) {
                             throw new NotParsableException();
                         }

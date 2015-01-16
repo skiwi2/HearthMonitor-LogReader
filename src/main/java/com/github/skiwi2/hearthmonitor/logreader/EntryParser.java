@@ -27,7 +27,6 @@ public interface EntryParser {
      * @param lineReader    The line reader from which extra lines can be obtained
      * @return  The LogEntry obtained after parsing the input.
      * @throws NotParsableException If this entry reader cannot parse the input to return a LogEntry.
-     * @throws NoMoreInputException If the line reader has no more input.
      */
-    LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException, NoMoreInputException;
+    LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException;
 }

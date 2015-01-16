@@ -84,7 +84,7 @@ public abstract class AbstractLogReader implements LogReader {
                 });
                 linesInMemory.clear();
                 return result;
-            } catch (NotParsableException | NoMoreInputException | NoSuchElementException ex) {
+            } catch (NotParsableException | NoSuchElementException ex) {
                 occurredExceptions.add(ex);
                 //try next entry parser
             }

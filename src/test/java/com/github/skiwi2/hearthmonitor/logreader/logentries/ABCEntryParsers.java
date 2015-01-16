@@ -4,7 +4,6 @@ import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.LineReader;
-import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
 
 import java.util.Arrays;
@@ -25,7 +24,7 @@ public class ABCEntryParsers implements EntryParsers {
                 }
 
                 @Override
-                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
                     if (!input.startsWith("A")) {
                         throw new NotParsableException();
                     }
@@ -39,7 +38,7 @@ public class ABCEntryParsers implements EntryParsers {
                 }
 
                 @Override
-                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
                     if (!input.startsWith("B")) {
                         throw new NotParsableException();
                     }
@@ -53,7 +52,7 @@ public class ABCEntryParsers implements EntryParsers {
                 }
 
                 @Override
-                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException, NoMoreInputException {
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
                     if (!input.startsWith("C")) {
                         throw new NotParsableException();
                     }
