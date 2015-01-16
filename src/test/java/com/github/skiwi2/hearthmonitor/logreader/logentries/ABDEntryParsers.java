@@ -58,13 +58,13 @@ public class ABDEntryParsers implements EntryParsers {
                     if (!input.startsWith("D")) {
                         throw new NotParsableException();
                     }
-                    if (!Objects.equals("1", lineReader.readLine())) {
+                    if (!Objects.equals("1", lineReader.readNextLine())) {
                         throw new NotParsableException();
                     }
-                    if (!Objects.equals("2", lineReader.readLine())) {
+                    if (!Objects.equals("2", lineReader.readNextLine())) {
                         throw new NotParsableException();
                     }
-                    if (!Objects.equals("3", lineReader.readLine())) {
+                    if (!Objects.equals("3", lineReader.readNextLine())) {
                         throw new NotParsableException();
                     }
                     return new DLogEntry();

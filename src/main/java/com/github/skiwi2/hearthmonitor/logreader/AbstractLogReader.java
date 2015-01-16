@@ -5,9 +5,11 @@ import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Can be extended to read lines from a log source.
@@ -42,13 +44,25 @@ public abstract class AbstractLogReader implements LogReader {
             try {
                 LogEntry result = entryParser.parse(line, new LineReader() {
                     @Override
-                    public String readLine() throws NoMoreInputException {
-                        return readLineFromLogAndSave();
+                    public String readNextLine() {
+                        try {
+                            return readLineFromLogAndSave();
+                        } catch (NoMoreInputException ex) {
+                            throw new NoSuchElementException();
+                        }
                     }
 
                     @Override
-                    public Optional<String> peekLine() {
-                        return peekLineFromLog();
+                    public boolean hasNextLine() {
+                        Optional<String> peekLine = peekLineFromLog();
+                        return peekLine.isPresent();
+                    }
+
+                    @Override
+                    public boolean nextLineMatches(final Predicate<String> condition) {
+                        Objects.requireNonNull(condition, "condition");
+                        Optional<String> peekLine = peekLineFromLog();
+                        return (peekLine.isPresent() && condition.test(peekLine.get()));
                     }
 
                     /**
@@ -59,7 +73,7 @@ public abstract class AbstractLogReader implements LogReader {
                      */
                     private Optional<String> peekLineFromLog() {
                         try {
-                            String line = readLineFromLog();
+                            String line = readLineFromLogOrPeekedLines();
                             Objects.requireNonNull(line, "line");
                             peekedLines.add(line);
                             return Optional.of(line);
@@ -70,7 +84,7 @@ public abstract class AbstractLogReader implements LogReader {
                 });
                 linesInMemory.clear();
                 return result;
-            } catch (NotParsableException | NoMoreInputException ex) {
+            } catch (NotParsableException | NoMoreInputException | NoSuchElementException ex) {
                 occurredExceptions.add(ex);
                 //try next entry parser
             }

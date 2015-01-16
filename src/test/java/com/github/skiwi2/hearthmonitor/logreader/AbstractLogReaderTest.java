@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -148,7 +147,7 @@ public class AbstractLogReaderTest {
                         if (!input.equals("A")) {
                             throw new NotParsableException();
                         }
-                        lineReader.peekLine();
+                        lineReader.hasNextLine();
                         return new ALogEntry();
                     }
                 },
@@ -163,10 +162,10 @@ public class AbstractLogReaderTest {
                         if (!input.equals("B")) {
                             throw new NotParsableException();
                         }
-                        if (!Objects.equals("1", lineReader.readLine())) {
+                        if (!Objects.equals("1", lineReader.readNextLine())) {
                             throw new NotParsableException();
                         }
-                        lineReader.peekLine();
+                        lineReader.hasNextLine();
                         return new BLogEntry();
                     }
                 },
@@ -181,8 +180,7 @@ public class AbstractLogReaderTest {
                         if (!input.equals("C")) {
                             throw new NotParsableException();
                         }
-                        lineReader.peekLine();
-                        lineReader.peekLine();
+                        lineReader.hasNextLine();
                         return new CLogEntry();
                     }
                 }
@@ -206,13 +204,10 @@ public class AbstractLogReaderTest {
                             throw new NotParsableException();
                         }
                         List<String> content = new ArrayList<>();
-                        while (true) {
-                            Optional<String> peekedLine = lineReader.peekLine();
-                            if (!peekedLine.isPresent() || peekedLine.get().equals("START")) {
-                                return new InfiniteLogEntry(content);
-                            }
-                            content.add(lineReader.readLine());
+                        while (lineReader.nextLineMatches(line -> !line.equals("START"))) {
+                            content.add(lineReader.readNextLine());
                         }
+                        return new InfiniteLogEntry(content);
                     }
                 }
             ));

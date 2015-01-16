@@ -12,11 +12,12 @@ import com.github.skiwi2.hearthmonitor.logreader.LogReaderUtils;
 import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
 import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
+import com.github.skiwi2.hearthmonitor.logreader.UncheckedNotParsableException;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.LogLineUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,7 +78,7 @@ public class CreateGameEntryParser implements EntryParser {
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException, NoMoreInputException {
         //construct a log reader from the line reader
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader(
-            lineReader.readLine(),
+            lineReader.readNextLine(),
             lineReader,
             line -> true,
             () -> new HashSet<>(Arrays.asList(
@@ -157,20 +158,25 @@ public class CreateGameEntryParser implements EntryParser {
             String entityId = gameEntityMatcher.group(1);
             builder.entityId(entityId);
 
-            Optional<String> nextLine = lineReader.peekLine();
-            while (nextLine.isPresent()) {
-                if (!LogLineUtils.isFromNamedLogger(nextLine.get()) || LogLineUtils.getNumberOfSpaces(nextLine.get()) <= 4) {
-                    //if the next line does not look like a tag value line
-                    break;
+            Predicate<String> readCondition = line -> {
+                try {
+                    return (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.getNumberOfSpaces(line) > 4);
+                } catch (NotParsableException ex) {
+                    throw new UncheckedNotParsableException(ex);
                 }
-                Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readLine());
-                if (!tagValueMatcher.find()) {
-                    throw new NotParsableException();
+            };
+            try {
+                while (lineReader.nextLineMatches(readCondition)) {
+                    Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
+                    if (!tagValueMatcher.find()) {
+                        throw new NotParsableException();
+                    }
+                    String tag = tagValueMatcher.group(1);
+                    String value = tagValueMatcher.group(2);
+                    builder.addTagValuePair(tag, value);
                 }
-                String tag = tagValueMatcher.group(1);
-                String value = tagValueMatcher.group(2);
-                builder.addTagValuePair(tag, value);
-                nextLine = lineReader.peekLine();
+            } catch (UncheckedNotParsableException ex) {
+                throw (NotParsableException)ex.getCause();
             }
 
             return builder.build();
@@ -256,20 +262,25 @@ public class CreateGameEntryParser implements EntryParser {
             builder.playerId(playerId);
             builder.gameAccountId(gameAccountId);
 
-            Optional<String> nextLine = lineReader.peekLine();
-            while (nextLine.isPresent()) {
-                if (!LogLineUtils.isFromNamedLogger(nextLine.get()) || LogLineUtils.getNumberOfSpaces(nextLine.get()) <= 4) {
-                    //if the next line does not look like a tag value line
-                    break;
+            Predicate<String> readCondition = line -> {
+                try {
+                    return (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.getNumberOfSpaces(line) > 4);
+                } catch (NotParsableException ex) {
+                    throw new UncheckedNotParsableException(ex);
                 }
-                Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readLine());
-                if (!tagValueMatcher.find()) {
-                    throw new NotParsableException();
+            };
+            try {
+                while (lineReader.nextLineMatches(readCondition)) {
+                    Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
+                    if (!tagValueMatcher.find()) {
+                        throw new NotParsableException();
+                    }
+                    String tag = tagValueMatcher.group(1);
+                    String value = tagValueMatcher.group(2);
+                    builder.addTagValuePair(tag, value);
                 }
-                String tag = tagValueMatcher.group(1);
-                String value = tagValueMatcher.group(2);
-                builder.addTagValuePair(tag, value);
-                nextLine = lineReader.peekLine();
+            } catch (UncheckedNotParsableException ex) {
+                throw (NotParsableException)ex.getCause();
             }
 
             return builder.build();

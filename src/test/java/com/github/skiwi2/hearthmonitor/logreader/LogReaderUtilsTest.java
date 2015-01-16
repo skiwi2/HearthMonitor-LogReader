@@ -8,11 +8,10 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
@@ -86,10 +85,7 @@ public class LogReaderUtilsTest {
     }
 
     private static class ListLineReader implements LineReader {
-        private final Iterator<String> iterator;
-        private final ListIterator<String> peekIterator;
-
-        private int peeks = 0;
+        private final ListIterator<String> listIterator;
 
         private ListLineReader(final String... lines) {
             this(Arrays.asList(lines));
@@ -97,31 +93,27 @@ public class LogReaderUtilsTest {
 
         private ListLineReader(final List<String> lines) {
             Objects.requireNonNull(lines, "lines");
-            List<String> tempLines = new ArrayList<>(lines);
-            this.iterator = tempLines.iterator();
-            this.peekIterator = tempLines.listIterator();
+            this.listIterator = new ArrayList<>(lines).listIterator();
         }
 
         @Override
-        public String readLine() throws NoMoreInputException {
-            for (int i = 0; i < peeks; i++) {
-                peekIterator.previous();
-            }
-            peeks = 0;
-            if (!iterator.hasNext()) {
-                throw new NoMoreInputException();
-            }
-            peekIterator.next();
-            return iterator.next();
+        public String readNextLine() {
+            return listIterator.next();
         }
 
         @Override
-        public Optional<String> peekLine() {
-            if (!peekIterator.hasNext()) {
-                return Optional.empty();
+        public boolean hasNextLine() {
+            return listIterator.hasNext();
+        }
+
+        @Override
+        public boolean nextLineMatches(final Predicate<String> condition) {
+            if (!listIterator.hasNext()) {
+                return false;
             }
-            peeks++;
-            return Optional.of(peekIterator.next());
+            String next = listIterator.next();
+            listIterator.previous();
+            return condition.test(next);
         }
     }
 }

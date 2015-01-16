@@ -1,7 +1,6 @@
 package com.github.skiwi2.hearthmonitor.logreader;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -40,10 +39,8 @@ public final class LogReaderUtils {
                     inputRead = true;
                     return input;
                 }
-
-                Optional<String> peekLine = extraLineReader.peekLine();
-                if (peekLine.isPresent() && extraReadCondition.test(peekLine.get())) {
-                    return extraLineReader.readLine();
+                if (extraLineReader.nextLineMatches(extraReadCondition)) {
+                    return extraLineReader.readNextLine();
                 }
                 throw new NoMoreInputException();
             }
