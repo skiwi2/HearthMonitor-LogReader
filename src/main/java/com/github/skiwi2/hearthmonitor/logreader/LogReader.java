@@ -17,7 +17,14 @@ public interface LogReader {
      *
      * @return  The next log entry.
      * @throws NotReadableException If the log entry could not be read.
-     * @throws NoMoreInputException If there is no more input.
+     * @throws java.util.NoSuchElementException If there is no more input.
      */
-    LogEntry readEntry() throws NotReadableException, NoMoreInputException;
+    LogEntry readNextEntry() throws NotReadableException;
+
+    /**
+     * Returns whether there is a next log entry.
+     *
+     * @return  Whether there is a next log entry.
+     */
+    boolean hasNextEntry();
 }

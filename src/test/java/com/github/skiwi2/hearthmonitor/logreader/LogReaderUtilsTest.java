@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -17,69 +18,83 @@ import static org.junit.Assert.*;
 
 public class LogReaderUtilsTest {
     @Test
-    public void testFromInputAndExtraLineReader() throws NoMoreInputException, NotReadableException {
+    public void testFromInputAndExtraLineReader() throws NotReadableException {
         LineReader lineReader = new ListLineReader("A", "B", "C", "random1", "random2");
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, new ABCEntryParsers());
 
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(BLogEntry.class, logReader.readEntry().getClass());
-        assertEquals(CLogEntry.class, logReader.readEntry().getClass());
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(CLogEntry.class, logReader.readNextEntry().getClass());
 
         try {
-            logReader.readEntry();
+            assertFalse(logReader.hasNextEntry());
+            logReader.readNextEntry();
             fail();
-        } catch (NoMoreInputException ex) {
+        } catch (NoSuchElementException ex) {
             //ok
         }
     }
 
     @Test
-    public void testFromInputAndExtraLineReaderFalseExtraReadCondition() throws NoMoreInputException, NotReadableException {
+    public void testFromInputAndExtraLineReaderFalseExtraReadCondition() throws NotReadableException {
         LineReader lineReader = new ListLineReader("A", "B", "C");
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> false, new ABCEntryParsers());
 
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
 
         try {
-            logReader.readEntry();
+            assertFalse(logReader.hasNextEntry());
+            logReader.readNextEntry();
             fail();
-        } catch (NoMoreInputException ex) {
+        } catch (NoSuchElementException ex) {
             //ok
         }
     }
 
     @Test
-    public void testFromInputAndExtraLineReaderNoExtraInput() throws NoMoreInputException, NotReadableException {
+    public void testFromInputAndExtraLineReaderNoExtraInput() throws NotReadableException {
         LineReader lineReader = new ListLineReader();
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("A", lineReader, line -> line.length() == 1, new ABCEntryParsers());
 
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
 
         try {
-            logReader.readEntry();
+            assertFalse(logReader.hasNextEntry());
+            logReader.readNextEntry();
             fail();
-        } catch (NoMoreInputException ex) {
+        } catch (NoSuchElementException ex) {
             //ok
         }
     }
 
     @Test
-    public void testFromInputAndExtraLineReaderInputNotReadable() throws NoMoreInputException, NotReadableException {
+    public void testFromInputAndExtraLineReaderInputNotReadable() throws NotReadableException {
         LineReader lineReader = new ListLineReader();
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, line -> line.length() == 1, new ABCEntryParsers());
 
         try {
-            logReader.readEntry();
+            assertTrue(logReader.hasNextEntry());
+            logReader.readNextEntry();
             fail();
         } catch (NotReadableException ex) {
             //ok
         }
 
         try {
-            logReader.readEntry();
+            assertFalse(logReader.hasNextEntry());
+            logReader.readNextEntry();
             fail();
-        } catch (NoMoreInputException ex) {
+        } catch (NoSuchElementException ex) {
             //ok
         }
     }

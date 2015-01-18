@@ -2,7 +2,6 @@ package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
@@ -20,6 +19,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -30,21 +30,30 @@ public class MonitoringFileLogReaderTest {
     public void testReadEntry() throws InterruptedException {
         List<LogEntry> logEntries = Collections.synchronizedList(new ArrayList<>());
 
-        AtomicReference<Exception> exceptionReference = new AtomicReference<>();
+        AtomicReference<Throwable> throwableReference = new AtomicReference<>();
 
         Thread thread = new Thread(() -> {
             try {
                 BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
                 try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryParsers())) {
-                    logEntries.add(logReader.readEntry());
-                    logEntries.add(logReader.readEntry());
-                    logEntries.add(logReader.readEntry());
-                    logReader.readEntry();
-                } catch (NoMoreInputException ex) {
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    //still believes there is a next entry
+                    assertTrue(logReader.hasNextEntry());
+                    logReader.readNextEntry();
+                } catch (NoSuchElementException ex) {
                     //ok
                 }
-            } catch (Exception ex) {
-                exceptionReference.set(ex);
+            } catch (Throwable throwable) {
+                throwableReference.set(throwable);
             }
         });
 
@@ -54,7 +63,8 @@ public class MonitoringFileLogReaderTest {
         thread.interrupt();
         Thread.sleep(250);
 
-        if (exceptionReference.get() != null) {
+        if (throwableReference.get() != null) {
+            throwableReference.get().printStackTrace();
             fail();
         }
 
@@ -74,21 +84,30 @@ public class MonitoringFileLogReaderTest {
             printWriter.println("C");
         }
 
-        AtomicInteger noMoreInputExceptions = new AtomicInteger(0);
-        AtomicReference<Exception> exceptionReference = new AtomicReference<>();
+        AtomicInteger noSuchElementExceptions = new AtomicInteger(0);
+        AtomicReference<Throwable> throwableReference = new AtomicReference<>();
 
         Thread thread = new Thread(() -> {
             try {
                 try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryParsers())) {
-                    logReader.readEntry();
-                    logReader.readEntry();
-                    logReader.readEntry();
-                    logReader.readEntry();
-                } catch (NoMoreInputException ex) {
-                    noMoreInputExceptions.incrementAndGet();
+
+                    assertTrue(logReader.hasNextEntry());
+                    logReader.readNextEntry();
+
+                    assertTrue(logReader.hasNextEntry());
+                    logReader.readNextEntry();
+
+                    assertTrue(logReader.hasNextEntry());
+                    logReader.readNextEntry();
+
+                    //still believes there is a next entry
+                    assertTrue(logReader.hasNextEntry());
+                    logReader.readNextEntry();
+                } catch (NoSuchElementException ex) {
+                    noSuchElementExceptions.incrementAndGet();
                 }
-            } catch (Exception ex) {
-                exceptionReference.set(ex);
+            } catch (Throwable throwable) {
+                throwableReference.set(throwable);
             }
         });
         thread.start();
@@ -97,11 +116,12 @@ public class MonitoringFileLogReaderTest {
         thread.interrupt();
         Thread.sleep(250);
 
-        if (exceptionReference.get() != null) {
+        if (throwableReference.get() != null) {
+            throwableReference.get().printStackTrace();
             fail();
         }
 
-        assertEquals(1, noMoreInputExceptions.get());
+        assertEquals(1, noSuchElementExceptions.get());
 
         Files.delete(logFile);
     }
@@ -116,23 +136,33 @@ public class MonitoringFileLogReaderTest {
             printWriter.println("C");
         }
 
-        AtomicReference<Exception> exceptionReference = new AtomicReference<>();
+        AtomicReference<Throwable> throwableReference = new AtomicReference<>();
 
         List<LogEntry> logEntries = Collections.synchronizedList(new ArrayList<>());
 
         Thread thread = new Thread(() -> {
             try {
                 try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryParsers())) {
-                    logEntries.add(logReader.readEntry());
-                    logEntries.add(logReader.readEntry());
-                    logEntries.add(logReader.readEntry());
-                    logEntries.add(logReader.readEntry());
-                    logReader.readEntry();
-                } catch (NoMoreInputException ex) {
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    //still believes there is a next entry
+                    assertTrue(logReader.hasNextEntry());
+                    logReader.readNextEntry();
+                } catch (NoSuchElementException ex) {
                     //ok
                 }
-            } catch (Exception ex) {
-                exceptionReference.set(ex);
+            } catch (Throwable throwable) {
+                throwableReference.set(throwable);
             }
         });
         thread.start();
@@ -145,7 +175,8 @@ public class MonitoringFileLogReaderTest {
         thread.interrupt();
         Thread.sleep(250);
 
-        if (exceptionReference.get() != null) {
+        if (throwableReference.get() != null) {
+            throwableReference.get().printStackTrace();
             fail();
         }
 

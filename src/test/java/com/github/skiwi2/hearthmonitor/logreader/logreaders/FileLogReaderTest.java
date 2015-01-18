@@ -1,7 +1,6 @@
 package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
@@ -12,28 +11,38 @@ import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class FileLogReaderTest {
     @Test
     public void testReadEntry() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers())) {
-            assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-            assertEquals(BLogEntry.class, logReader.readEntry().getClass());
-            assertEquals(CLogEntry.class, logReader.readEntry().getClass());
+
+            assertTrue(logReader.hasNextEntry());
+            assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+
+            assertTrue(logReader.hasNextEntry());
+            assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+            
+            assertTrue(logReader.hasNextEntry());
+            assertEquals(CLogEntry.class, logReader.readNextEntry().getClass());
+
+            assertFalse(logReader.hasNextEntry());
         }
     }
 
-    @Test(expected = NoMoreInputException.class)
+    @Test(expected = NoSuchElementException.class)
     public void testReadEntryNoMoreInput() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers())) {
-            logReader.readEntry();
-            logReader.readEntry();
-            logReader.readEntry();
-            logReader.readEntry();
+
+            logReader.readNextEntry();
+            logReader.readNextEntry();
+            logReader.readNextEntry();
+            logReader.readNextEntry();
         }
     }
 }

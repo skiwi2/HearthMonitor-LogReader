@@ -3,11 +3,11 @@ package com.github.skiwi2.hearthmonitor.logreader;
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -18,6 +18,7 @@ import java.util.function.Predicate;
  */
 public abstract class AbstractLogReader implements LogReader {
     private final Set<EntryParser> entryParsers;
+    private final Iterator<String> readIterator;
 
     private final List<String> linesInMemory = new ArrayList<>();
     private final List<String> peekedLines = new LinkedList<>();
@@ -26,14 +27,16 @@ public abstract class AbstractLogReader implements LogReader {
      * Initializes an AbstractLogReader instance.
      *
      * @param entryParsers  The supplier of a set of entry parsers
-     * @throws  java.lang.NullPointerException  If entryParsers.get() is null.
+     * @param readIterator  The iterator used to read lines from the log source
+     * @throws  java.lang.NullPointerException  If entryParsers.get() returns null or if readIterator is null.
      */
-    protected AbstractLogReader(final EntryParsers entryParsers) {
+    protected AbstractLogReader(final EntryParsers entryParsers, final Iterator<String> readIterator) {
         this.entryParsers = Objects.requireNonNull(entryParsers.get(), "entryParsers.get()");
+        this.readIterator = Objects.requireNonNull(readIterator, "readIterator");
     }
 
     @Override
-    public LogEntry readEntry() throws NotReadableException, NoMoreInputException {
+    public LogEntry readNextEntry() throws NotReadableException {
         List<Exception> occurredExceptions = new ArrayList<>();
 
         String line = readLineFromLogAndSave();
@@ -45,41 +48,23 @@ public abstract class AbstractLogReader implements LogReader {
                 LogEntry result = entryParser.parse(line, new LineReader() {
                     @Override
                     public String readNextLine() {
-                        try {
-                            return readLineFromLogAndSave();
-                        } catch (NoMoreInputException ex) {
-                            throw new NoSuchElementException();
-                        }
+                        return readLineFromLogAndSave();
                     }
 
                     @Override
                     public boolean hasNextLine() {
-                        Optional<String> peekLine = peekLineFromLog();
-                        return peekLine.isPresent();
+                        return hasNextEntry();
                     }
 
                     @Override
                     public boolean nextLineMatches(final Predicate<String> condition) {
-                        Objects.requireNonNull(condition, "condition");
-                        Optional<String> peekLine = peekLineFromLog();
-                        return (peekLine.isPresent() && condition.test(peekLine.get()));
-                    }
-
-                    /**
-                     * Returns the next line from the log file and saves it to the peeked lines list.
-                     *
-                     * @return The next line from the log file.
-                     * @throws java.lang.NullPointerException If line is null.
-                     */
-                    private Optional<String> peekLineFromLog() {
-                        try {
-                            String line = readLineFromLogOrPeekedLines();
-                            Objects.requireNonNull(line, "line");
-                            peekedLines.add(line);
-                            return Optional.of(line);
-                        } catch (NoMoreInputException ex) {
-                            return Optional.empty();
+                        if (!hasNextLine()) {
+                            return false;
                         }
+                        String line = readLineFromPeekedLinesOrLog();
+                        Objects.requireNonNull(line, "line");
+                        peekedLines.add(line);
+                        return condition.test(line);
                     }
                 });
                 linesInMemory.clear();
@@ -94,36 +79,33 @@ public abstract class AbstractLogReader implements LogReader {
         throw new NotReadableException(notParsableLines, occurredExceptions);
     }
 
-    /**
-     * Returns the next line from the log file.
-     *
-     * @return  The next line from the log file.
-     * @throws NoMoreInputException If no more lines are present.
-     */
-    protected abstract String readLineFromLog() throws NoMoreInputException;
-
-    /**
-     * Returns the next line from the log file, or from the lines that have been peeked.
-     *
-     * @return  The next lien from the log file, or from the lines that have been peeked.
-     * @throws NoMoreInputException If no more lines are present.
-     */
-    private String readLineFromLogOrPeekedLines() throws NoMoreInputException {
-        if (!peekedLines.isEmpty()) {
-            return peekedLines.remove(0);
-        }
-        return readLineFromLog();
+    @Override
+    public boolean hasNextEntry() {
+        return (!peekedLines.isEmpty() || readIterator.hasNext());
     }
 
     /**
-     * Returns the next line from the log file and saves it.
+     * Returns the next line from the lines that have been peeked, or if empty, from the log source.
      *
-     * @return  The next line from the log file.
-     * @throws NoMoreInputException If no more lines are present.
+     * @return  The next line from the lines that have been peeked, or if empty, from the log source.
+     * @throws java.util.NoSuchElementException If no more lines are present.
+     */
+    private String readLineFromPeekedLinesOrLog() {
+        if (!peekedLines.isEmpty()) {
+            return peekedLines.remove(0);
+        }
+        return readIterator.next();
+    }
+
+    /**
+     * Returns the next line from the log source and saves it.
+     *
+     * @return  The next line from the log source.
+     * @throws java.util.NoSuchElementException If no more lines are present.
      * @throws java.lang.NullPointerException   If line is null.
      */
-    private String readLineFromLogAndSave() throws NoMoreInputException {
-        String line = readLineFromLogOrPeekedLines();
+    private String readLineFromLogAndSave() {
+        String line = readLineFromPeekedLinesOrLog();
         Objects.requireNonNull(line, "line");
         linesInMemory.add(line);
         return line;

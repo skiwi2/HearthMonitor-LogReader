@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 
@@ -23,28 +24,28 @@ import static org.junit.Assert.*;
 
 public class AbstractLogReaderTest {
     @Test
-    public void testReadEntryExpectedEntries() throws NoMoreInputException, NotReadableException {
+    public void testReadNextEntryExpectedEntries() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new ABCEntryParsers());
 
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(BLogEntry.class, logReader.readEntry().getClass());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
     }
 
-    @Test(expected = NoMoreInputException.class)
-    public void testReadEntryNoMoreEntries() throws NoMoreInputException, NotReadableException {
+    @Test(expected = NoSuchElementException.class)
+    public void testReadNextEntryNoMoreEntries() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new ABCEntryParsers());
 
-        logReader.readEntry();
-        logReader.readEntry();
-        logReader.readEntry();
+        logReader.readNextEntry();
+        logReader.readNextEntry();
+        logReader.readNextEntry();
     }
 
     @Test
-    public void testReadEntryNoReadersAvailable() throws NoMoreInputException {
+    public void testReadNextEntryNoReadersAvailable() {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new EmptyEntryParsers());
 
         try {
-            logReader.readEntry();
+            logReader.readNextEntry();
             fail();
         } catch (NotReadableException ex) {
             assertEquals(1, ex.getLines().size());
@@ -53,23 +54,52 @@ public class AbstractLogReaderTest {
     }
 
     @Test
-    public void testReadLogEntrySpanningMultipleLines() throws NoMoreInputException, NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "3", "B"), new ABDEntryParsers());
+    public void testHasNextEntryNoEntries() {
+        LogReader logReader = new ListLogReader(Arrays.asList(), new ABCEntryParsers());
 
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(DLogEntry.class, logReader.readEntry().getClass());
-        assertEquals(BLogEntry.class, logReader.readEntry().getClass());
+        assertFalse(logReader.hasNextEntry());
+        assertFalse(logReader.hasNextEntry());
     }
 
     @Test
-    public void testReadLogEntrySpanningMultipleLinesLastEntryNotReadable() throws NoMoreInputException, NotReadableException {
+    public void testHasNextEntryOneEntry() {
+        LogReader logReader = new ListLogReader(Arrays.asList("A"), new ABCEntryParsers());
+
+        assertTrue(logReader.hasNextEntry());
+        assertTrue(logReader.hasNextEntry());
+    }
+
+    @Test
+    public void testHasNextEntryWithReads() throws NotReadableException {
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), new ABCEntryParsers());
+
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(CLogEntry.class, logReader.readNextEntry().getClass());
+        assertFalse(logReader.hasNextEntry());
+    }
+
+    @Test
+    public void testReadNextEntrySpanningMultipleLines() throws NotReadableException {
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "3", "B"), new ABDEntryParsers());
+
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(DLogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+    }
+
+    @Test
+    public void testReadNextEntrySpanningMultipleLinesLastEntryNotReadable() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "D", "1","2"), new ABDEntryParsers());
 
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(BLogEntry.class, logReader.readEntry().getClass());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
 
         try {
-            logReader.readEntry();
+            logReader.readNextEntry();
             fail();
         } catch (NotReadableException ex) {
             assertEquals(Arrays.asList("D", "1", "2"), ex.getLines());
@@ -77,57 +107,57 @@ public class AbstractLogReaderTest {
     }
 
     @Test
-    public void testReadLogEntrySpanningMultipleLinesIncorrectInput() throws NoMoreInputException, NotReadableException {
+    public void testReadNextEntrySpanningMultipleLinesIncorrectInput() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "4", "B"), new ABDEntryParsers());
 
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
 
         try {
-            logReader.readEntry();
+            logReader.readNextEntry();
             fail();
         } catch (NotReadableException ex) {
             assertEquals(Arrays.asList("D", "1", "2", "4"), ex.getLines());
         }
 
-        assertEquals(BLogEntry.class, logReader.readEntry().getClass());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
     }
 
     @Test
-    public void testReadLogEntryWithPeekingEntryReaders() throws NoMoreInputException, NotReadableException {
+    public void testReadNextEntryWithPeekingEntryReaders() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "A", "A", "B", "1", "B", "1", "C", "C", "B", "1", "A", "C"), new ABCPeekEntryParsers());
 
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(BLogEntry.class, logReader.readEntry().getClass());
-        assertEquals(BLogEntry.class, logReader.readEntry().getClass());
-        assertEquals(CLogEntry.class, logReader.readEntry().getClass());
-        assertEquals(CLogEntry.class, logReader.readEntry().getClass());
-        assertEquals(BLogEntry.class, logReader.readEntry().getClass());
-        assertEquals(ALogEntry.class, logReader.readEntry().getClass());
-        assertEquals(CLogEntry.class, logReader.readEntry().getClass());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(CLogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(CLogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+        assertEquals(CLogEntry.class, logReader.readNextEntry().getClass());
 
         try {
-            logReader.readEntry();
+            logReader.readNextEntry();
             fail();
-        } catch (NoMoreInputException ex) {
+        } catch (NoSuchElementException ex) {
             //ok
         }
     }
 
     @Test
-    public void testReadLogEntryInfiniteLogEntries() throws NoMoreInputException, NotReadableException {
+    public void testReadNextEntryInfiniteLogEntries() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("START", "1", "2", "3", "START", "START", "1", "2", "3", "4", "5"), new InfiniteReadPeekEntryParsers());
 
-        LogEntry logEntry1 = logReader.readEntry();
+        LogEntry logEntry1 = logReader.readNextEntry();
         assertEquals(InfiniteLogEntry.class, logEntry1.getClass());
         assertEquals(Arrays.asList("1", "2", "3"), ((InfiniteLogEntry)logEntry1).getContent());
 
-        LogEntry logEntry2 = logReader.readEntry();
+        LogEntry logEntry2 = logReader.readNextEntry();
         assertEquals(InfiniteLogEntry.class, logEntry2.getClass());
         assertEquals(Arrays.<String>asList(), ((InfiniteLogEntry)logEntry2).getContent());
 
-        LogEntry logEntry3 = logReader.readEntry();
+        LogEntry logEntry3 = logReader.readNextEntry();
         assertEquals(InfiniteLogEntry.class, logEntry3.getClass());
         assertEquals(Arrays.asList("1", "2", "3", "4", "5"), ((InfiniteLogEntry)logEntry3).getContent());
     }

@@ -1,7 +1,12 @@
 package com.github.skiwi2.hearthmonitor.logreader;
 
+import java.util.Iterator;
 import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Utility class to create a LogReader from other sources.
@@ -30,20 +35,33 @@ public final class LogReaderUtils {
         Objects.requireNonNull(extraLineReader, "extraLineReader");
         Objects.requireNonNull(extraReadCondition, "extraReadCondition");
         Objects.requireNonNull(entryParsers, "entryParsers");
-        return new AbstractLogReader(entryParsers) {
-            private boolean inputRead = false;
+        return new AbstractLogReader(entryParsers, createReadIteratorForFromInputAndExtraLineReader(input, extraLineReader, extraReadCondition)) { };
+    }
+
+    /**
+     * Returns an iterator for the given input and extra line reader.
+     *
+     * @param input The given input
+     * @param extraLineReader   The given extra line reader
+     * @param extraReadCondition    The given extra read condition
+     * @return  The iterator for the given input and extra line reader.
+     */
+    private static Iterator<String> createReadIteratorForFromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<String> extraReadCondition) {
+        LineReader conditionalLineReader = LineReader.readWhile(extraLineReader, extraReadCondition);
+        Iterator<String> lineReaderIterator = new Iterator<String>() {
+            @Override
+            public boolean hasNext() {
+                return conditionalLineReader.hasNextLine();
+            }
 
             @Override
-            protected String readLineFromLog() throws NoMoreInputException {
-                if (!inputRead) {
-                    inputRead = true;
-                    return input;
-                }
-                if (extraLineReader.nextLineMatches(extraReadCondition)) {
-                    return extraLineReader.readNextLine();
-                }
-                throw new NoMoreInputException();
+            public String next() {
+                return conditionalLineReader.readNextLine();
             }
         };
+        return Stream.concat(
+            Stream.of(input),
+            StreamSupport.stream(Spliterators.spliteratorUnknownSize(lineReaderIterator, Spliterator.NONNULL), false)
+        ).iterator();
     }
 }

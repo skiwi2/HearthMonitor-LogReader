@@ -3,10 +3,12 @@ package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 import com.github.skiwi2.hearthmonitor.logreader.AbstractLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParsers;
-import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -25,29 +27,43 @@ public class MonitoringFileLogReader extends AbstractLogReader implements Closea
      * @throws  java.lang.NullPointerException  If bufferedReader or entryParsers.get() is null.
      */
     public MonitoringFileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers) {
-        super(entryParsers);
+        super(entryParsers, createReadIterator(bufferedReader));
         this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
     }
 
     /**
-     * Returns the next line from the log file.
+     * Returns an iterator for the given buffered reader.
      *
-     * This method will block until input is available, or an IOException or InterruptedException has occurred.
-     *
-     * @return  The next line from the log file.
-     * @throws com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException If an underlying IOException or InterruptedException has been thrown.
+     * @param bufferedReader    The given buffered reader
+     * @return  The iterator for the given buffered reader.
      */
-    @Override
-    protected String readLineFromLog() throws NoMoreInputException {
-        try {
-            String line;
-            while ((line = bufferedReader.readLine()) == null) {
-                Thread.sleep(100);
+    private static Iterator<String> createReadIterator(final BufferedReader bufferedReader) {
+        Iterator<String> bufferedReaderIterator = bufferedReader.lines().iterator();
+        return new Iterator<String>() {
+            private boolean isInterrupted = false;
+
+            @Override
+            public boolean hasNext() {
+                return !isInterrupted;
             }
-            return line;
-        } catch (IOException | InterruptedException | RuntimeException ex) {
-            throw new NoMoreInputException(ex);
-        }
+
+            @Override
+            public String next() {
+                if (isInterrupted) {
+                    throw new NoSuchElementException();
+                }
+                try {
+                    while (!bufferedReaderIterator.hasNext()) {
+                        Thread.sleep(100);
+                    }
+                    return bufferedReaderIterator.next();
+                } catch (InterruptedException | UncheckedIOException ex) {
+                    isInterrupted = true;
+                    Thread.currentThread().isInterrupted();
+                    throw new NoSuchElementException();
+                }
+            }
+        };
     }
 
     @Override

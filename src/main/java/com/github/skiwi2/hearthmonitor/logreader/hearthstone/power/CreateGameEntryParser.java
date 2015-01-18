@@ -9,7 +9,6 @@ import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 import com.github.skiwi2.hearthmonitor.logreader.LineReader;
 import com.github.skiwi2.hearthmonitor.logreader.LogReader;
 import com.github.skiwi2.hearthmonitor.logreader.LogReaderUtils;
-import com.github.skiwi2.hearthmonitor.logreader.NoMoreInputException;
 import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
 import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.LogLineUtils;
@@ -88,20 +87,16 @@ public class CreateGameEntryParser implements EntryParser {
 
         try {
             CreateGameLogEntry.Builder builder = new CreateGameLogEntry.Builder();
-            GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readEntry();
+            GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readNextEntry();
             builder.gameEntityLogEntry(gameEntityLogEntry);
 
-            while (true) {
-                try {
-                    PlayerLogEntry playerLogEntry = (PlayerLogEntry)logReader.readEntry();
-                    builder.addPlayerLogEntry(playerLogEntry);
-                } catch (NoMoreInputException ex) {
-                    break;
-                }
+            while (logReader.hasNextEntry()) {
+                PlayerLogEntry playerLogEntry = (PlayerLogEntry)logReader.readNextEntry();
+                builder.addPlayerLogEntry(playerLogEntry);
             }
 
             return builder.build();
-        } catch (NotReadableException | NoMoreInputException ex) {
+        } catch (NotReadableException ex) {
             throw new NotParsableException(ex);
         }
     }

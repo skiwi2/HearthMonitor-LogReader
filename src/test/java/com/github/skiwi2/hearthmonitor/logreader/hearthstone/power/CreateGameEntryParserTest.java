@@ -4,9 +4,9 @@ import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.GameEntityLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry.PlayerLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.logreaders.FileLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.CreateGameEntryParser.GameEntityEntryParser;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.CreateGameEntryParser.PlayerEntryParser;
+import com.github.skiwi2.hearthmonitor.logreader.logreaders.FileLogReader;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -24,7 +24,7 @@ public class CreateGameEntryParserTest {
     public void testGameEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGameGameEntity.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new GameEntityEntryParser())))) {
-            GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readEntry();
+            GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readNextEntry();
 
             assertEquals("1", gameEntityLogEntry.getEntityId());
 
@@ -42,7 +42,7 @@ public class CreateGameEntryParserTest {
     public void testPlayer() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGamePlayer.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new PlayerEntryParser())))) {
-            PlayerLogEntry playerLogEntry = (PlayerLogEntry)logReader.readEntry();
+            PlayerLogEntry playerLogEntry = (PlayerLogEntry)logReader.readNextEntry();
 
             assertEquals("2", playerLogEntry.getEntityId());
             assertEquals("1", playerLogEntry.getPlayerId());
@@ -71,7 +71,7 @@ public class CreateGameEntryParserTest {
     public void testCreateGame() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
-            CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readEntry();
+            CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readNextEntry();
 
             GameEntityLogEntry gameEntityLogEntry = createGameLogEntry.getGameEntityLogEntry();
 
