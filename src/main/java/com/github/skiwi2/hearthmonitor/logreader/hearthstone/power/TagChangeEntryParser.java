@@ -25,16 +25,16 @@ public class TagChangeEntryParser implements EntryParser {
     /**
      * Pattern that checks if a string matches the following:
      *  - starts with literal text '[Power] GameState.DebugPrintPower() - TAG_CHANGE Entity='
-     *  - followed by one or more word characters, captured as the 1st group
+     *  - followed by zero or more word characters, captured as the 1st group
      *  - followed by literal text ' tag='
-     *  - followed by one or more word characters, captured as the 2nd group
+     *  - followed by zero or more word characters, captured as the 2nd group
      *  - followed by literal text ' value='
-     *  - followed by one or more word characters, captured as the 3rd group
+     *  - followed by zero or more word characters, captured as the 3rd group
      *  - ending with zero or more characters
      */
     private static final Pattern EXTRACT_TAG_CHANGE_PATTERN =
-        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - TAG_CHANGE Entity=") + "(\\w+)"
-             + Pattern.quote(" tag=") + "(\\w+)" + Pattern.quote(" value=") + "(\\w+).*");
+        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - TAG_CHANGE Entity=") + "(\\w*)"
+             + Pattern.quote(" tag=") + "(\\w*)" + Pattern.quote(" value=") + "(\\w*).*");
 
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {

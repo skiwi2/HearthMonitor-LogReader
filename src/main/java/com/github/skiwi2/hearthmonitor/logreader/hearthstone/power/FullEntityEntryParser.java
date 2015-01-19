@@ -36,25 +36,25 @@ public class FullEntityEntryParser implements EntryParser {
     /**
      * Pattern that checks if a string matches the following:
      *  - starts with literal text '[Power] GameState.DebugPrintPower() - FULL_ENTITY - Creating ID='
-     *  - followed by one or more digits, captured as the 1st group
+     *  - followed by zero or more digits, captured as the 1st group
      *  - followed by literal text ' CardID='
-     *  - followed by one or more word characters, captured as the 2nd group
+     *  - followed by zero or more word characters, captured as the 2nd group
      *  - ending with zero or more characters
      */
     private static final Pattern EXTRACT_FULL_ENTITY_PATTERN =
-        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - FULL_ENTITY - Creating ID=") + "(\\d+)"
-            + Pattern.quote(" CardID=") + "(\\w+).*$");
+        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - FULL_ENTITY - Creating ID=") + "(\\d*)"
+            + Pattern.quote(" CardID=") + "(\\w*).*$");
 
     /**
      * Pattern that checks if a string matches the following:
      *   - starts with literal text '[Power] GameState.DebugPrintPower() -     tag='
-     *   - followed by one or more word characters, captured as the 1st group
+     *   - followed by zero or more word characters, captured as the 1st group
      *   - followed by literal text ' value='
-     *   - followed by one or more word characters, captured as the 2nd group
+     *   - followed by zero or more word characters, captured as the 2nd group
      *   - ending with zero or more characters
      */
     private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     tag=") + "(\\w+)" + Pattern.quote(" value=") + "(\\w+).*$");
+        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     tag=") + "(\\w*)" + Pattern.quote(" value=") + "(\\w*).*$");
 
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
