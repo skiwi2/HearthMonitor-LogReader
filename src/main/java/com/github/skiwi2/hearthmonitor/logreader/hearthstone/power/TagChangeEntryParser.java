@@ -10,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Used to parse [Power] TAG_CHANGE entries.
+ *
  * @author Frank van Heeswijk
  */
 public class TagChangeEntryParser implements EntryParser {
