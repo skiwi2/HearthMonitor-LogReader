@@ -124,22 +124,20 @@ public class CreateGameEntryParser implements EntryParser {
         /**
          * Pattern that checks if a string matches the following:
          *   - starts with literal text '[Power] GameState.DebugPrintPower() -     GameEntity EntityID='
-         *   - followed by zero or more characters, captured as the 1st group
-         *   - ending with zero or more characters
+         *   - ending with zero or more characters, captured as the 1st group
          */
         private static final Pattern EXTRACT_GAME_ENTITY_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     GameEntity EntityID=") + "(.*).*$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     GameEntity EntityID=") + "(.*)$");
 
         /**
          * Pattern that checks if a string matches the following:
          *   - starts with literal text '[Power] GameState.DebugPrintPower() -         tag='
          *   - followed by zero or more characters, captured as the 1st group
          *   - followed by literal text ' value='
-         *   - followed by zero or more characters, captured as the 2nd group
-         *   - ending with zero or more characters
+         *   - ending with zero or more characters, captured as the 2nd group
          */
         private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(.*)" + Pattern.quote(" value=") + "(.*).*$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
 
         @Override
         public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
@@ -220,11 +218,10 @@ public class CreateGameEntryParser implements EntryParser {
          *   - starts with literal text '[Power] GameState.DebugPrintPower() -         tag='
          *   - followed by zero or more characters, captured as the 1st group
          *   - followed by literal text ' value='
-         *   - followed by zero or more characters, captured as the 2nd group
-         *   - ending with zero or more characters
+         *   - ending with zero or more characters, captured as the 2nd group
          */
         private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(.*)" + Pattern.quote(" value=") + "(.*).*$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
 
         @Override
         public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {

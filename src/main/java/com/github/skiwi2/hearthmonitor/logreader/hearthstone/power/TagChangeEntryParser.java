@@ -31,12 +31,11 @@ public class TagChangeEntryParser implements EntryParser {
      *  - followed by literal text ' tag='
      *  - followed by zero or more characters, captured as the 2nd group
      *  - followed by literal text ' value='
-     *  - followed by zero or more characters, captured as the 3rd group
-     *  - ending with zero or more characters
+     *  - ending with zero or more characters, captured as the 3rd group
      */
     private static final Pattern EXTRACT_TAG_CHANGE_PATTERN =
         Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - TAG_CHANGE Entity=") + "(.*)"
-             + Pattern.quote(" tag=") + "(.*)" + Pattern.quote(" value=") + "(.*).*");
+             + Pattern.quote(" tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
 
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {

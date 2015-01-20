@@ -38,23 +38,21 @@ public class FullEntityEntryParser implements EntryParser {
      *  - starts with literal text '[Power] GameState.DebugPrintPower() - FULL_ENTITY - Creating ID='
      *  - followed by zero or more characters, captured as the 1st group
      *  - followed by literal text ' CardID='
-     *  - followed by zero or more characters, captured as the 2nd group
-     *  - ending with zero or more characters
+     *  - ending with zero or more characters, captured as the 2nd group
      */
     private static final Pattern EXTRACT_FULL_ENTITY_PATTERN =
         Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - FULL_ENTITY - Creating ID=") + "(.*)"
-            + Pattern.quote(" CardID=") + "(.*).*$");
+            + Pattern.quote(" CardID=") + "(.*)$");
 
     /**
      * Pattern that checks if a string matches the following:
      *   - starts with literal text '[Power] GameState.DebugPrintPower() -     tag='
      *   - followed by zero or more characters, captured as the 1st group
      *   - followed by literal text ' value='
-     *   - followed by zero or more characters, captured as the 2nd group
-     *   - ending with zero or more characters
+     *   - ending with zero or more characters, captured as the 2nd group
      */
     private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     tag=") + "(.*)" + Pattern.quote(" value=") + "(.*).*$");
+        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
 
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
