@@ -124,11 +124,11 @@ public class CreateGameEntryParser implements EntryParser {
         /**
          * Pattern that checks if a string matches the following:
          *   - starts with literal text '[Power] GameState.DebugPrintPower() -     GameEntity EntityID='
-         *   - followed by zero or more digits, captured as the 1st group
+         *   - followed by zero or more characters, captured as the 1st group
          *   - ending with zero or more characters
          */
         private static final Pattern EXTRACT_GAME_ENTITY_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     GameEntity EntityID=") + "(\\d*).*$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     GameEntity EntityID=") + "(.*).*$");
 
         /**
          * Pattern that checks if a string matches the following:
