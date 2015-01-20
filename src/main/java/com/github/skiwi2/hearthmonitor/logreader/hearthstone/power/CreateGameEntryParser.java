@@ -133,13 +133,13 @@ public class CreateGameEntryParser implements EntryParser {
         /**
          * Pattern that checks if a string matches the following:
          *   - starts with literal text '[Power] GameState.DebugPrintPower() -         tag='
-         *   - followed by zero or more word characters, captured as the 1st group
+         *   - followed by zero or more characters, captured as the 1st group
          *   - followed by literal text ' value='
-         *   - followed by zero or more word characters, captured as the 2nd group
+         *   - followed by zero or more characters, captured as the 2nd group
          *   - ending with zero or more characters
          */
         private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(\\w*)" + Pattern.quote(" value=") + "(\\w*).*$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(.*)" + Pattern.quote(" value=") + "(.*).*$");
 
         @Override
         public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
@@ -200,31 +200,31 @@ public class CreateGameEntryParser implements EntryParser {
         /**
          * Pattern that checks if a string matches the following:
          *   - starts with literal text '[Power] GameState.DebugPrintPower() -     Player EntityID='
-         *   - followed by zero or more digits, captured as the 1st group
+         *   - followed by zero or more characters, captured as the 1st group
          *   - followed by literal text ' PlayerID='
-         *   - followed by zero or more digits, captured as the 2nd group
+         *   - followed by zero or more characters, captured as the 2nd group
          *   - followed by literal text ' GameAccountId=[hi='
-         *   - followed by zero or more digits, captured as the 3rd group
+         *   - followed by zero or more characters, captured as the 3rd group
          *   - followed by literal text ' lo='
-         *   - followed by zero or more digits, captured as the 4th group
+         *   - followed by zero or more characters, captured as the 4th group
          *   - followed by the literal text ']'
          *   - ending with zero or more characters
          */
         private static final Pattern EXTRACT_PLAYER_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     Player EntityID=") + "(\\d*)"
-                + Pattern.quote(" PlayerID=") + "(\\d*)" + Pattern.quote(" GameAccountId=[hi=") + "(\\d*)" + Pattern.quote(" lo=")
-                + "(\\d*)" + Pattern.quote("]") + ".*$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     Player EntityID=") + "(.*)"
+                + Pattern.quote(" PlayerID=") + "(.*)" + Pattern.quote(" GameAccountId=[hi=") + "(.*)" + Pattern.quote(" lo=")
+                + "(.*)" + Pattern.quote("]") + ".*$");
 
         /**
          * Pattern that checks if a string matches the following:
          *   - starts with literal text '[Power] GameState.DebugPrintPower() -         tag='
-         *   - followed by zero or more word characters, captured as the 1st group
+         *   - followed by zero or more characters, captured as the 1st group
          *   - followed by literal text ' value='
-         *   - followed by zero or more word characters, captured as the 2nd group
+         *   - followed by zero or more characters, captured as the 2nd group
          *   - ending with zero or more characters
          */
         private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(\\w*)" + Pattern.quote(" value=") + "(\\w*).*$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(.*)" + Pattern.quote(" value=") + "(.*).*$");
 
         @Override
         public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
