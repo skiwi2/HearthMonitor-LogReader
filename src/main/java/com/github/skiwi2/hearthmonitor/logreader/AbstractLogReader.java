@@ -18,7 +18,7 @@ import java.util.function.Predicate;
  */
 public abstract class AbstractLogReader implements LogReader {
     private final Set<EntryParser> entryParsers;
-    private final Iterator<String> readIterator;
+    private final Iterator<String> filteredIterator;
 
     private final List<String> linesInMemory = new ArrayList<>();
     private final List<String> peekedLines = new LinkedList<>();
@@ -28,11 +28,25 @@ public abstract class AbstractLogReader implements LogReader {
      *
      * @param entryParsers  The supplier of a set of entry parsers
      * @param readIterator  The iterator used to read lines from the log source
+     * @param filterPredicate   The predicate to use to filter the lines read from the log source
+     * @throws  java.lang.NullPointerException  If entryParsers.get() returns null or if readIterator or filterPredicate is null.
+     */
+    protected AbstractLogReader(final EntryParsers entryParsers, final Iterator<String> readIterator, final Predicate<String> filterPredicate) {
+        Objects.requireNonNull(filterPredicate, "filterPredicate");
+        Objects.requireNonNull(readIterator, "readIterator");
+        this.entryParsers = Objects.requireNonNull(entryParsers.get(), "entryParsers.get()");
+        this.filteredIterator = IteratorUtils.filteredIterator(readIterator, filterPredicate);
+    }
+
+    /**
+     * Initializes an AbstractLogReader instance without a filter predicate defined.
+     *
+     * @param entryParsers  The supplier of a set of entry parsers
+     * @param readIterator  The iterator used to read lines from the log source
      * @throws  java.lang.NullPointerException  If entryParsers.get() returns null or if readIterator is null.
      */
     protected AbstractLogReader(final EntryParsers entryParsers, final Iterator<String> readIterator) {
-        this.entryParsers = Objects.requireNonNull(entryParsers.get(), "entryParsers.get()");
-        this.readIterator = Objects.requireNonNull(readIterator, "readIterator");
+        this(entryParsers, readIterator, string -> true);
     }
 
     @Override
@@ -81,11 +95,13 @@ public abstract class AbstractLogReader implements LogReader {
 
     @Override
     public boolean hasNextEntry() {
-        return (!peekedLines.isEmpty() || readIterator.hasNext());
+        return (!peekedLines.isEmpty() || filteredIterator.hasNext());
     }
 
     /**
      * Returns the next line from the lines that have been peeked, or if empty, from the log source.
+     *
+     * The returned line has to satisfy the filter predicate.
      *
      * @return  The next line from the lines that have been peeked, or if empty, from the log source.
      * @throws java.util.NoSuchElementException If no more lines are present.
@@ -94,7 +110,7 @@ public abstract class AbstractLogReader implements LogReader {
         if (!peekedLines.isEmpty()) {
             return peekedLines.remove(0);
         }
-        return readIterator.next();
+        return filteredIterator.next();
     }
 
     /**

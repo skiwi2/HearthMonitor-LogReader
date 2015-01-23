@@ -34,6 +34,24 @@ public class FileLogReaderTest {
         }
     }
 
+    @Test
+    public void testReadEntryFilterLines() throws Exception {
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test-filter.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers(), string -> !string.equals("0"))) {
+
+            assertTrue(logReader.hasNextEntry());
+            assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+
+            assertTrue(logReader.hasNextEntry());
+            assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+
+            assertTrue(logReader.hasNextEntry());
+            assertEquals(CLogEntry.class, logReader.readNextEntry().getClass());
+
+            assertFalse(logReader.hasNextEntry());
+        }
+    }
+
     @Test(expected = NoSuchElementException.class)
     public void testReadEntryNoMoreInput() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);

@@ -30,6 +30,26 @@ public class ListLogReaderTest {
         assertFalse(logReader.hasNextEntry());
     }
 
+    @Test
+    public void testReadEntryFilterLines() throws NotReadableException {
+        LogReader logReader = new ListLogReader(
+            Arrays.asList("0", "A", "0", "B", "0", "C", "0"),
+            new ABCEntryParsers(),
+            string -> !string.equals("0")
+        );
+
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
+
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
+
+        assertTrue(logReader.hasNextEntry());
+        assertEquals(CLogEntry.class, logReader.readNextEntry().getClass());
+
+        assertFalse(logReader.hasNextEntry());
+    }
+
     @Test(expected = NoSuchElementException.class)
     public void testReadEntryNoMoreInput() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), new ABCEntryParsers());

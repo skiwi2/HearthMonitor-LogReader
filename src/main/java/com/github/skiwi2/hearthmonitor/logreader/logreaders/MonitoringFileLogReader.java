@@ -10,6 +10,7 @@ import java.io.UncheckedIOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Used to read log entries from a log file, blocking until more input is available.
@@ -28,6 +29,21 @@ public class MonitoringFileLogReader extends AbstractLogReader implements Closea
      */
     public MonitoringFileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers) {
         super(entryParsers, createReadIterator(bufferedReader));
+        this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
+    }
+
+    /**
+     * Constructs a new MonitoringFileLogReader instance.
+     *
+     * The filter predicate can be used to filter the lines you want to traverse.
+     *
+     * @param bufferedReader    The buffered reader from which to read
+     * @param entryParsers  The supplier of a set of entry parsers
+     * @param filterPredicate   The predicate to filter the lines with
+     * @throws  java.lang.NullPointerException  If bufferedReader, filterPredicate or entryParsers.get() is null.
+     */
+    public MonitoringFileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers, final Predicate<String> filterPredicate) {
+        super(entryParsers, createReadIterator(bufferedReader), filterPredicate);
         this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
     }
 

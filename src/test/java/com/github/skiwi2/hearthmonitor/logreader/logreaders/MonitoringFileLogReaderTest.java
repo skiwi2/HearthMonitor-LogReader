@@ -75,6 +75,54 @@ public class MonitoringFileLogReaderTest {
     }
 
     @Test
+    public void testReadEntryFilterLines() throws InterruptedException {
+        List<LogEntry> logEntries = Collections.synchronizedList(new ArrayList<>());
+
+        AtomicReference<Throwable> throwableReference = new AtomicReference<>();
+
+        Thread thread = new Thread(() -> {
+            try {
+                BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test-filter.log").toURI()), StandardCharsets.UTF_8);
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryParsers(), string -> !string.equals("0"))) {
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    //still believes there is a next entry
+                    assertTrue(logReader.hasNextEntry());
+                    logReader.readNextEntry();
+                } catch (NoSuchElementException ex) {
+                    //ok
+                }
+            } catch (Throwable throwable) {
+                throwableReference.set(throwable);
+            }
+        });
+
+        thread.start();
+
+        Thread.sleep(250);
+        thread.interrupt();
+        Thread.sleep(250);
+
+        if (throwableReference.get() != null) {
+            throwableReference.get().printStackTrace();
+            fail();
+        }
+
+        assertEquals(3, logEntries.size());
+        assertEquals(ALogEntry.class, logEntries.get(0).getClass());
+        assertEquals(BLogEntry.class, logEntries.get(1).getClass());
+        assertEquals(CLogEntry.class, logEntries.get(2).getClass());
+    }
+
+    @Test
     public void testReadEntryInterruptWhileReading() throws IOException, InterruptedException {
         Path logFile = Files.createTempFile("test", "log");
 
@@ -170,6 +218,75 @@ public class MonitoringFileLogReaderTest {
         Thread.sleep(250);
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND))) {
             printWriter.println("A");
+        }
+        Thread.sleep(250);
+        thread.interrupt();
+        Thread.sleep(250);
+
+        if (throwableReference.get() != null) {
+            throwableReference.get().printStackTrace();
+            fail();
+        }
+
+        assertEquals(4, logEntries.size());
+        assertEquals(ALogEntry.class, logEntries.get(0).getClass());
+        assertEquals(BLogEntry.class, logEntries.get(1).getClass());
+        assertEquals(CLogEntry.class, logEntries.get(2).getClass());
+        assertEquals(ALogEntry.class, logEntries.get(3).getClass());
+
+        Files.delete(logFile);
+    }
+
+    @Test
+    public void testReadEntryAddWhileReadingFilterLines() throws IOException, InterruptedException {
+        Path logFile = Files.createTempFile("test-filter", "log");
+
+        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile, StandardCharsets.UTF_8))) {
+            printWriter.println("0");
+            printWriter.println("A");
+            printWriter.println("0");
+            printWriter.println("B");
+            printWriter.println("0");
+            printWriter.println("C");
+            printWriter.println("0");
+        }
+
+        AtomicReference<Throwable> throwableReference = new AtomicReference<>();
+
+        List<LogEntry> logEntries = Collections.synchronizedList(new ArrayList<>());
+
+        Thread thread = new Thread(() -> {
+            try {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryParsers(), string -> !string.equals("0"))) {
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    assertTrue(logReader.hasNextEntry());
+                    logEntries.add(logReader.readNextEntry());
+
+                    //still believes there is a next entry
+                    assertTrue(logReader.hasNextEntry());
+                    logReader.readNextEntry();
+                } catch (NoSuchElementException ex) {
+                    //ok
+                }
+            } catch (Throwable throwable) {
+                throwableReference.set(throwable);
+            }
+        });
+        thread.start();
+
+        Thread.sleep(250);
+        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND))) {
+            printWriter.println("0");
+            printWriter.println("A");
+            printWriter.println("0");
         }
         Thread.sleep(250);
         thread.interrupt();

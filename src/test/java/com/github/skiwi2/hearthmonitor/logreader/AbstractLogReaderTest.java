@@ -162,6 +162,27 @@ public class AbstractLogReaderTest {
         assertEquals(Arrays.asList("1", "2", "3", "4", "5"), ((InfiniteLogEntry)logEntry3).getContent());
     }
 
+    @Test
+    public void testReadNextEntryInfiniteLogEntriesFilterLines() throws NotReadableException {
+        LogReader logReader = new ListLogReader(
+            Arrays.asList("0", "START", "0", "0", "1", "2", "0", "3", "START", "0", "START", "0", "1", "0", "2", "0", "3", "0", "4", "0", "5", "0"),
+            new InfiniteReadPeekEntryParsers(),
+            string -> !string.equals("0")
+        );
+
+        LogEntry logEntry1 = logReader.readNextEntry();
+        assertEquals(InfiniteLogEntry.class, logEntry1.getClass());
+        assertEquals(Arrays.asList("1", "2", "3"), ((InfiniteLogEntry)logEntry1).getContent());
+
+        LogEntry logEntry2 = logReader.readNextEntry();
+        assertEquals(InfiniteLogEntry.class, logEntry2.getClass());
+        assertEquals(Arrays.<String>asList(), ((InfiniteLogEntry)logEntry2).getContent());
+
+        LogEntry logEntry3 = logReader.readNextEntry();
+        assertEquals(InfiniteLogEntry.class, logEntry3.getClass());
+        assertEquals(Arrays.asList("1", "2", "3", "4", "5"), ((InfiniteLogEntry)logEntry3).getContent());
+    }
+
     private static class ABCPeekEntryParsers implements EntryParsers {
         @Override
         public Set<EntryParser> get() {
