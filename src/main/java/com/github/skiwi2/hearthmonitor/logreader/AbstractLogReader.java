@@ -4,7 +4,6 @@ import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -18,10 +17,9 @@ import java.util.function.Predicate;
  */
 public abstract class AbstractLogReader implements LogReader {
     private final Set<EntryParser> entryParsers;
-    private final Iterator<String> filteredIterator;
+    private final MatchingIterator<String> matchingIterator;
 
     private final List<String> linesInMemory = new ArrayList<>();
-    private final List<String> peekedLines = new LinkedList<>();
 
     /**
      * Initializes an AbstractLogReader instance.
@@ -35,7 +33,8 @@ public abstract class AbstractLogReader implements LogReader {
         Objects.requireNonNull(filterPredicate, "filterPredicate");
         Objects.requireNonNull(readIterator, "readIterator");
         this.entryParsers = Objects.requireNonNull(entryParsers.get(), "entryParsers.get()");
-        this.filteredIterator = IteratorUtils.filteredIterator(readIterator, filterPredicate);
+        Iterator<String> filteredIterator = IteratorUtils.filteredIterator(readIterator, filterPredicate);
+        this.matchingIterator = MatchingIterator.fromIterator(filteredIterator);
     }
 
     /**
@@ -53,7 +52,8 @@ public abstract class AbstractLogReader implements LogReader {
     public LogEntry readNextEntry() throws NotReadableException {
         List<Exception> occurredExceptions = new ArrayList<>();
 
-        String line = readLineFromLogAndSave();
+        String line = matchingIterator.next();
+        linesInMemory.add(line);
         for (EntryParser entryParser : entryParsers) {
             if (!entryParser.isParsable(line)) {
                 continue;
@@ -62,23 +62,19 @@ public abstract class AbstractLogReader implements LogReader {
                 LogEntry result = entryParser.parse(line, new LineReader() {
                     @Override
                     public String readNextLine() {
-                        return readLineFromLogAndSave();
+                        String nextLine = matchingIterator.next();
+                        linesInMemory.add(nextLine);
+                        return nextLine;
                     }
 
                     @Override
                     public boolean hasNextLine() {
-                        return hasNextEntry();
+                        return matchingIterator.hasNext();
                     }
 
                     @Override
                     public boolean nextLineMatches(final Predicate<String> condition) {
-                        if (!hasNextLine()) {
-                            return false;
-                        }
-                        String line = readLineFromPeekedLinesOrLog();
-                        Objects.requireNonNull(line, "line");
-                        peekedLines.add(line);
-                        return condition.test(line);
+                        return matchingIterator.nextMatches(condition);
                     }
                 });
                 linesInMemory.clear();
@@ -95,35 +91,6 @@ public abstract class AbstractLogReader implements LogReader {
 
     @Override
     public boolean hasNextEntry() {
-        return (!peekedLines.isEmpty() || filteredIterator.hasNext());
-    }
-
-    /**
-     * Returns the next line from the lines that have been peeked, or if empty, from the log source.
-     *
-     * The returned line has to satisfy the filter predicate.
-     *
-     * @return  The next line from the lines that have been peeked, or if empty, from the log source.
-     * @throws java.util.NoSuchElementException If no more lines are present.
-     */
-    private String readLineFromPeekedLinesOrLog() {
-        if (!peekedLines.isEmpty()) {
-            return peekedLines.remove(0);
-        }
-        return filteredIterator.next();
-    }
-
-    /**
-     * Returns the next line from the log source and saves it.
-     *
-     * @return  The next line from the log source.
-     * @throws java.util.NoSuchElementException If no more lines are present.
-     * @throws java.lang.NullPointerException   If line is null.
-     */
-    private String readLineFromLogAndSave() {
-        String line = readLineFromPeekedLinesOrLog();
-        Objects.requireNonNull(line, "line");
-        linesInMemory.add(line);
-        return line;
+        return matchingIterator.hasNext();
     }
 }
