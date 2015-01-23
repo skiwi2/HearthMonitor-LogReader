@@ -130,6 +130,15 @@ public class CreateGameEntryParserTest {
         }
     }
 
+    @Test
+    public void testCreateGameTwice() throws Exception {
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame-twice.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
+            assertEquals(CreateGameLogEntry.class, logReader.readNextEntry().getClass());
+            assertEquals(CreateGameLogEntry.class, logReader.readNextEntry().getClass());
+        }
+    }
+
     private static PlayerLogEntry getPlayerLogEntryByPlayerId(final String playerId, final Set<PlayerLogEntry> playerLogEntries) {
         return playerLogEntries.stream()
             .filter(playerLogEntry -> playerLogEntry.getPlayerId().equals(playerId))
