@@ -10,10 +10,19 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
 public class ListLogReaderTest {
+    @Test
+    public void testConstructorPECS() {
+        Predicate<Object> predicate = obj -> true;
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), new ABCEntryParsers(), predicate);
+
+        assertNotNull(logReader);
+    }
+
     @Test
     public void testReadEntry() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), new ABCEntryParsers());

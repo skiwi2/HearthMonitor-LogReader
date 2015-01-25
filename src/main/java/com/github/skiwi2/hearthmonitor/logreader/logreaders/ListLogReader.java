@@ -37,7 +37,7 @@ public class ListLogReader extends AbstractLogReader {
      * @param filterPredicate   The predicate to filter the lines with
      * @throws  java.lang.NullPointerException  If inputList, filterPredicate or entryParsers.get() is null.
      */
-    public ListLogReader(final List<String> inputList, final EntryParsers entryParsers, final Predicate<String> filterPredicate) {
+    public ListLogReader(final List<String> inputList, final EntryParsers entryParsers, final Predicate<? super String> filterPredicate) {
         super(entryParsers, new ArrayList<>(inputList).iterator(), filterPredicate);
     }
 }

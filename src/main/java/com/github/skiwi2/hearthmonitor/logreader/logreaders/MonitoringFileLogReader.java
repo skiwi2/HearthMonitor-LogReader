@@ -42,7 +42,7 @@ public class MonitoringFileLogReader extends AbstractLogReader implements Closea
      * @param filterPredicate   The predicate to filter the lines with
      * @throws  java.lang.NullPointerException  If bufferedReader, filterPredicate or entryParsers.get() is null.
      */
-    public MonitoringFileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers, final Predicate<String> filterPredicate) {
+    public MonitoringFileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers, final Predicate<? super String> filterPredicate) {
         super(entryParsers, createReadIterator(bufferedReader), filterPredicate);
         this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
     }

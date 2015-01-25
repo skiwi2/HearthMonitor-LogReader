@@ -22,10 +22,20 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
 public class MonitoringFileLogReaderTest {
+    @Test
+    public void testConstructorPECS() throws Exception {
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
+        Predicate<Object> predicate = obj -> true;
+        try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryParsers(), predicate)) {
+            assertNotNull(logReader);
+        }
+    }
+
     @Test
     public void testReadEntry() throws InterruptedException {
         List<LogEntry> logEntries = Collections.synchronizedList(new ArrayList<>());

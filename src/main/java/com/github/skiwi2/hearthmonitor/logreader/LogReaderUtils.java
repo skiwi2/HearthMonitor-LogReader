@@ -31,7 +31,7 @@ public final class LogReaderUtils {
      * @param entryParsers  The supplier of a set of entry parsers
      * @return  A new LogReader that can read log entries from the input string, the LineReader for the extra lines and the read condition.
      */
-    public static LogReader fromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<String> extraReadCondition, final EntryParsers entryParsers) {
+    public static LogReader fromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<? super String> extraReadCondition, final EntryParsers entryParsers) {
         Objects.requireNonNull(extraLineReader, "extraLineReader");
         Objects.requireNonNull(extraReadCondition, "extraReadCondition");
         Objects.requireNonNull(entryParsers, "entryParsers");
@@ -46,7 +46,7 @@ public final class LogReaderUtils {
      * @param extraReadCondition    The given extra read condition
      * @return  The iterator for the given input and extra line reader.
      */
-    private static Iterator<String> createReadIteratorForFromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<String> extraReadCondition) {
+    private static Iterator<String> createReadIteratorForFromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<? super String> extraReadCondition) {
         LineReader conditionalLineReader = LineReader.readWhile(extraLineReader, extraReadCondition);
         Iterator<String> lineReaderIterator = new Iterator<String>() {
             @Override

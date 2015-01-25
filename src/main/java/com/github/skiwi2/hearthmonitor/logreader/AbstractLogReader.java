@@ -29,7 +29,7 @@ public abstract class AbstractLogReader implements LogReader {
      * @param filterPredicate   The predicate to use to filter the lines read from the log source
      * @throws  java.lang.NullPointerException  If entryParsers.get() returns null or if readIterator or filterPredicate is null.
      */
-    protected AbstractLogReader(final EntryParsers entryParsers, final Iterator<String> readIterator, final Predicate<String> filterPredicate) {
+    protected AbstractLogReader(final EntryParsers entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
         Objects.requireNonNull(filterPredicate, "filterPredicate");
         Objects.requireNonNull(readIterator, "readIterator");
         this.entryParsers = Objects.requireNonNull(entryParsers.get(), "entryParsers.get()");

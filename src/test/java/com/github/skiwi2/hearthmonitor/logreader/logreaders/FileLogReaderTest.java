@@ -12,10 +12,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
 public class FileLogReaderTest {
+    @Test
+    public void testConstructorPECS() throws Exception {
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
+        Predicate<Object> predicate = obj -> true;
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers(), predicate)) {
+            assertNotNull(logReader);
+        }
+    }
+
     @Test
     public void testReadEntry() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);

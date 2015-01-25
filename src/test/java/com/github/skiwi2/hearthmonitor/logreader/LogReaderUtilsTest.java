@@ -99,6 +99,15 @@ public class LogReaderUtilsTest {
         }
     }
 
+    @Test
+    public void testFromInputAndExtraLineReaderPECS() {
+        LineReader lineReader = new ListLineReader();
+        Predicate<Object> predicate = obj -> true;
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, predicate, new ABCEntryParsers());
+
+        assertNotNull(logReader);
+    }
+
     private static class ListLineReader implements LineReader {
         private final ListIterator<String> listIterator;
 
