@@ -122,7 +122,7 @@ public class LogReaderUtilsTest {
         }
 
         @Override
-        public boolean nextLineMatches(final Predicate<String> condition) {
+        public boolean nextLineMatches(final Predicate<? super String> condition) {
             if (!listIterator.hasNext()) {
                 return false;
             }

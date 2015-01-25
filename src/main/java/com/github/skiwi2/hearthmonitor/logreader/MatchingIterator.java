@@ -21,7 +21,7 @@ public interface MatchingIterator<E> extends Iterator<E> {
      * @return  Whether the next element matches the given condition.
      * @throws  java.lang.NullPointerException  If condition is null.
      */
-    boolean nextMatches(final Predicate<E> condition);
+    boolean nextMatches(final Predicate<? super E> condition);
 
     /**
      * Returns a matching iterator constructed from an iterator.
@@ -30,7 +30,7 @@ public interface MatchingIterator<E> extends Iterator<E> {
      * @param <E>   The type of the elements in the iterator
      * @return  The matching iterator constructed from the iterator.
      */
-    static <E> MatchingIterator<E> fromIterator(final Iterator<E> iterator) {
+    static <E> MatchingIterator<E> fromIterator(final Iterator<? extends E> iterator) {
         return new MatchingIterator<E>() {
             private final List<E> peekedElements = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public interface MatchingIterator<E> extends Iterator<E> {
             }
 
             @Override
-            public boolean nextMatches(final Predicate<E> condition) {
+            public boolean nextMatches(final Predicate<? super E> condition) {
                 Objects.requireNonNull(condition, "condition");
                 Optional<E> peekElement = peek();
                 return (peekElement.isPresent() && condition.test(peekElement.get()));

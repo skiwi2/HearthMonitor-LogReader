@@ -31,7 +31,7 @@ public interface LineReader {
      * @param condition The condition that the next line should match
      * @return  Whether the next line matches the given condition.
      */
-    boolean nextLineMatches(final Predicate<String> condition);
+    boolean nextLineMatches(final Predicate<? super String> condition);
 
     /**
      * Returns a LineReader that reads from another LineReader while the read condition is true.
@@ -41,7 +41,7 @@ public interface LineReader {
      * @return A LineReader that reads from another LineReader while the read condition is true.
      * @throws java.lang.NullPointerException If lineReader or readCondition is null.
      */
-    static LineReader readWhile(final LineReader lineReader, final Predicate<String> readCondition) {
+    static LineReader readWhile(final LineReader lineReader, final Predicate<? super String> readCondition) {
         Objects.requireNonNull(lineReader, "lineReader");
         Objects.requireNonNull(readCondition, "readCondition");
         return new LineReader() {
@@ -59,8 +59,8 @@ public interface LineReader {
             }
 
             @Override
-            public boolean nextLineMatches(final Predicate<String> condition) {
-                return lineReader.nextLineMatches(readCondition.and(condition));
+            public boolean nextLineMatches(final Predicate<? super String> condition) {
+                return lineReader.nextLineMatches(line -> (readCondition.test(line) && condition.test(line)));
             }
         };
     }

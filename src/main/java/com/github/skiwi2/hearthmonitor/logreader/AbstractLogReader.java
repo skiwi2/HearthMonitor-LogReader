@@ -73,7 +73,7 @@ public abstract class AbstractLogReader implements LogReader {
                     }
 
                     @Override
-                    public boolean nextLineMatches(final Predicate<String> condition) {
+                    public boolean nextLineMatches(final Predicate<? super String> condition) {
                         return matchingIterator.nextMatches(condition);
                     }
                 });

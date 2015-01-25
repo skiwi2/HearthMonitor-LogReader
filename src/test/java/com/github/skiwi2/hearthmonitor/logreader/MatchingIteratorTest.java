@@ -40,4 +40,12 @@ public class MatchingIteratorTest {
             //ok
         }
     }
+
+    @Test
+    public void testFromIteratorPECS() {
+        Iterator<Integer> iterator = Arrays.asList(1, 2, 3).iterator();
+        MatchingIterator<Number> matchingIterator = MatchingIterator.fromIterator(iterator);
+
+        assertTrue(matchingIterator.nextMatches(number -> number.intValue() == 1));
+    }
 }

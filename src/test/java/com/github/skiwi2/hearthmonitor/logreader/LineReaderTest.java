@@ -140,6 +140,15 @@ public class LineReaderTest {
         }
     }
 
+    @Test
+    public void testReadWhilePECS() {
+        LineReader originalLineReader = new ListLineReader(Arrays.asList("A", "B", "C", "random"));
+        Predicate<Object> predicate = obj -> true;
+        LineReader lineReader = LineReader.readWhile(originalLineReader, predicate);
+
+        assertNotNull(lineReader);
+    }
+
     private static class ListLineReader implements LineReader {
         private final ListIterator<String> listIterator;
 
@@ -158,7 +167,7 @@ public class LineReaderTest {
         }
 
         @Override
-        public boolean nextLineMatches(final Predicate<String> condition) {
+        public boolean nextLineMatches(final Predicate<? super String> condition) {
             String line = listIterator.next();
             listIterator.previous();
             return condition.test(line);
