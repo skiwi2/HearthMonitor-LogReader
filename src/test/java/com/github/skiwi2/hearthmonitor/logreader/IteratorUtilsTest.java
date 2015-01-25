@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
@@ -30,5 +31,14 @@ public class IteratorUtilsTest {
         } catch (NoSuchElementException ex) {
             //ok
         }
+    }
+
+    @Test
+    public void testFilteredIteratorPECS() {
+        Iterator<Integer> iterator = Arrays.asList(0, 1, 2).iterator();
+        Predicate<Object> predicate = obj -> true;
+        Iterator<Number> filteredIterator = IteratorUtils.filteredIterator(iterator, predicate);
+
+        assertNotNull(filteredIterator);
     }
 }

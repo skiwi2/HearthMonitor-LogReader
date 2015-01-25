@@ -23,7 +23,7 @@ public final class IteratorUtils {
      * @param <E>   The type of elements
      * @return  The iterator that is a view on the given iterator only considering elements that match the condition predicate.
      */
-    public static <E> Iterator<E> filteredIterator(final Iterator<E> iterator, final Predicate<E> condition) {
+    public static <E> Iterator<E> filteredIterator(final Iterator<? extends E> iterator, final Predicate<? super E> condition) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, 0), false)
             .filter(condition)
             .iterator();
