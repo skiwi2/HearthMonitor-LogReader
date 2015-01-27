@@ -9,7 +9,7 @@ import java.util.Objects;
  *
  * @author Frank van Heeswijk
  */
-public class NotReadableException extends Exception  {
+public class NotReadableException extends Exception {
     private static final long serialVersionUID = -117259271357929934L;
 
     private final List<String> lines = new ArrayList<>();
