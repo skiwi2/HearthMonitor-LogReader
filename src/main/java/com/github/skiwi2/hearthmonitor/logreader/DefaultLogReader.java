@@ -31,7 +31,7 @@ public class DefaultLogReader implements LogReader {
      * @param readIterator  The iterator used to read lines from the log source
      * @throws  java.lang.NullPointerException  If entryParsers or readIterator is null.
      */
-    protected DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator) {
+    public DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator) {
         this(entryParsers, readIterator, string -> true);
     }
 
@@ -45,7 +45,7 @@ public class DefaultLogReader implements LogReader {
      * @param filterPredicate   The predicate to use to filter the lines read from the log source
      * @throws  java.lang.NullPointerException  If entryParsers, readIterator or filterPredicate is null.
      */
-    protected DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
+    public DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
         Objects.requireNonNull(entryParsers, "entryParsers");
         Objects.requireNonNull(readIterator, "readIterator");
         Objects.requireNonNull(filterPredicate, "filterPredicate");
