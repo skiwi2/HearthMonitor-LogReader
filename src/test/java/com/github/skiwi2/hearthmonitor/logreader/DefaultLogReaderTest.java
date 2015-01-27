@@ -22,11 +22,11 @@ import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
-public class AbstractLogReaderTest {
+public class DefaultLogReaderTest {
     @Test
     public void testConstructorPECS() {
         Iterator<String> iterator = Arrays.<String>asList().iterator();
-        LogReader logReader = new AbstractLogReader(EntryParsers.getABExtendedEntryParsers(), iterator) { };
+        LogReader logReader = new DefaultLogReader(EntryParsers.getABExtendedEntryParsers(), iterator);
 
         assertNotNull(logReader);
     }
@@ -35,7 +35,7 @@ public class AbstractLogReaderTest {
     public void testConstructorWithFilterPredicatePECS() {
         Iterator<String> iterator = Arrays.<String>asList().iterator();
         Predicate<Object> filterPredicate = obj -> true;
-        LogReader logReader = new AbstractLogReader(EntryParsers.getABExtendedEntryParsers(), iterator, filterPredicate) { };
+        LogReader logReader = new DefaultLogReader(EntryParsers.getABExtendedEntryParsers(), iterator, filterPredicate);
 
         assertNotNull(logReader);
     }

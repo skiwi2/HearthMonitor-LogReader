@@ -1,6 +1,6 @@
 package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
-import com.github.skiwi2.hearthmonitor.logreader.AbstractLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.DefaultLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 
@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  *
  * @author Frank van Heeswijk
  */
-public class FileLogReader extends AbstractLogReader implements CloseableLogReader {
+public class FileLogReader extends DefaultLogReader implements CloseableLogReader {
     private final BufferedReader bufferedReader;
 
     /**

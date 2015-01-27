@@ -36,7 +36,7 @@ public final class LogReaderUtils {
         Objects.requireNonNull(extraLineReader, "extraLineReader");
         Objects.requireNonNull(extraReadCondition, "extraReadCondition");
         Objects.requireNonNull(entryParsers, "entryParsers");
-        return new AbstractLogReader(entryParsers, createReadIteratorForFromInputAndExtraLineReader(input, extraLineReader, extraReadCondition)) { };
+        return new DefaultLogReader(entryParsers, createReadIteratorForFromInputAndExtraLineReader(input, extraLineReader, extraReadCondition));
     }
 
     /**

@@ -11,25 +11,27 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * Can be extended to read lines from a log source.
+ * Used to read log entries from a log source via an iterator.
+ *
+ * It is encouraged to extend this class and pass the iterator via the subclass.
  *
  * @author Frank van Heeswijk
  */
-public abstract class AbstractLogReader implements LogReader {
+public class DefaultLogReader implements LogReader {
     private final Set<? extends EntryParser> entryParsers;
     private final MatchingIterator<String> matchingIterator;
 
     private final List<String> linesInMemory = new ArrayList<>();
 
     /**
-     * Initializes an AbstractLogReader instance.
+     * Constructs a new DefaultLogReader instance.
      *
      * @param entryParsers  The set of entry parsers
      * @param readIterator  The iterator used to read lines from the log source
      * @param filterPredicate   The predicate to use to filter the lines read from the log source
      * @throws  java.lang.NullPointerException  If entryParsers, readIterator or filterPredicate is null.
      */
-    protected AbstractLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
+    protected DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
         Objects.requireNonNull(filterPredicate, "filterPredicate");
         Objects.requireNonNull(readIterator, "readIterator");
         this.entryParsers = Objects.requireNonNull(entryParsers, "entryParsers");
@@ -38,13 +40,15 @@ public abstract class AbstractLogReader implements LogReader {
     }
 
     /**
-     * Initializes an AbstractLogReader instance without a filter predicate defined.
+     * Constructs a new DefaultLogReader instance.
+     *
+     * The filter predicate can be used to filter the lines you want to traverse.
      *
      * @param entryParsers  The set of entry parsers
      * @param readIterator  The iterator used to read lines from the log source
-     * @throws  java.lang.NullPointerException  If entryParsers.get() returns null or if readIterator is null.
+     * @throws  java.lang.NullPointerException  If entryParsers or readIterator is null.
      */
-    protected AbstractLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator) {
+    protected DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator) {
         this(entryParsers, readIterator, string -> true);
     }
 

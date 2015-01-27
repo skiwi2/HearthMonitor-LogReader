@@ -1,6 +1,6 @@
 package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
-import com.github.skiwi2.hearthmonitor.logreader.AbstractLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.DefaultLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.function.Predicate;
  *
  * @author Frank van Heeswijk
  */
-public class ListLogReader extends AbstractLogReader {
+public class ListLogReader extends DefaultLogReader {
     /**
      * Constructs a new ListLogReader instance.
      *
