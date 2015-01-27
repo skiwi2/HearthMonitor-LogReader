@@ -29,6 +29,19 @@ public class DefaultLogReader implements LogReader {
      *
      * @param entryParsers  The set of entry parsers
      * @param readIterator  The iterator used to read lines from the log source
+     * @throws  java.lang.NullPointerException  If entryParsers or readIterator is null.
+     */
+    protected DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator) {
+        this(entryParsers, readIterator, string -> true);
+    }
+
+    /**
+     * Constructs a new DefaultLogReader instance.
+     *
+     * The filter predicate can be used to filter the lines you want to traverse.
+     *
+     * @param entryParsers  The set of entry parsers
+     * @param readIterator  The iterator used to read lines from the log source
      * @param filterPredicate   The predicate to use to filter the lines read from the log source
      * @throws  java.lang.NullPointerException  If entryParsers, readIterator or filterPredicate is null.
      */
@@ -39,19 +52,6 @@ public class DefaultLogReader implements LogReader {
         this.entryParsers = new HashSet<>(entryParsers);
         Iterator<String> filteredIterator = IteratorUtils.filteredIterator(readIterator, filterPredicate);
         this.matchingIterator = MatchingIterator.fromIterator(filteredIterator);
-    }
-
-    /**
-     * Constructs a new DefaultLogReader instance.
-     *
-     * The filter predicate can be used to filter the lines you want to traverse.
-     *
-     * @param entryParsers  The set of entry parsers
-     * @param readIterator  The iterator used to read lines from the log source
-     * @throws  java.lang.NullPointerException  If entryParsers or readIterator is null.
-     */
-    protected DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator) {
-        this(entryParsers, readIterator, string -> true);
     }
 
     @Override
