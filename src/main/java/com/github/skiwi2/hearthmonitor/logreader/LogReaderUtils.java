@@ -32,7 +32,7 @@ public final class LogReaderUtils {
      * @param entryParsers  The set of entry parsers
      * @return  A new LogReader that can read log entries from the input string, the LineReader for the extra lines and the read condition.
      */
-    public static LogReader fromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<? super String> extraReadCondition, final Set<EntryParser> entryParsers) {
+    public static LogReader fromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<? super String> extraReadCondition, final Set<? extends EntryParser> entryParsers) {
         Objects.requireNonNull(extraLineReader, "extraLineReader");
         Objects.requireNonNull(extraReadCondition, "extraReadCondition");
         Objects.requireNonNull(entryParsers, "entryParsers");

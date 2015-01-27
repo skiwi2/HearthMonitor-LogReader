@@ -103,7 +103,7 @@ public class LogReaderUtilsTest {
     public void testFromInputAndExtraLineReaderPECS() {
         LineReader lineReader = new ListLineReader();
         Predicate<Object> predicate = obj -> true;
-        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, predicate, EntryParsers.getABCEntryParsers());
+        LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader("", lineReader, predicate, EntryParsers.getABExtendedEntryParsers());
 
         assertNotNull(logReader);
     }
