@@ -18,7 +18,7 @@ public class TransitioningEntryParserTest {
     @Test
     public void testTransitioning() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Transitioning.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new TransitioningEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new TransitioningEntryParser())))) {
             TransitioningLogEntry transitioningLogEntry = (TransitioningLogEntry)logReader.readNextEntry();
 
             assertEquals("Gul'dan", transitioningLogEntry.getName());

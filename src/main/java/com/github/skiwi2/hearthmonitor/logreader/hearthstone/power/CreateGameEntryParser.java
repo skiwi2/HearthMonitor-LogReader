@@ -79,7 +79,7 @@ public class CreateGameEntryParser implements EntryParser {
             lineReader.readNextLine(),
             lineReader,
             line -> (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > 0),
-            () -> new HashSet<>(Arrays.asList(
+            new HashSet<>(Arrays.asList(
                 new GameEntityEntryParser(),
                 new PlayerEntryParser()
             ))

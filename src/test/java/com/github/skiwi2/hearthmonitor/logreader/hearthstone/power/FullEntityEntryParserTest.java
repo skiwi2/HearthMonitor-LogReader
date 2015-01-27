@@ -18,7 +18,7 @@ public class FullEntityEntryParserTest {
     @Test
     public void testFullEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("FullEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new FullEntityEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new FullEntityEntryParser())))) {
             FullEntityLogEntry fullEntityLogEntry = (FullEntityLogEntry)logReader.readNextEntry();
 
             assertEquals("4", fullEntityLogEntry.getId());

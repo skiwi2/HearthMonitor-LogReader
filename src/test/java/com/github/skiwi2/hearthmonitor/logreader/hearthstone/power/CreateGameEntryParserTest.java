@@ -23,7 +23,7 @@ public class CreateGameEntryParserTest {
     @Test
     public void testGameEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGameGameEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new GameEntityEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new GameEntityEntryParser())))) {
             GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readNextEntry();
 
             assertEquals("1", gameEntityLogEntry.getEntityId());
@@ -41,7 +41,7 @@ public class CreateGameEntryParserTest {
     @Test
     public void testPlayer() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGamePlayer.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new PlayerEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new PlayerEntryParser())))) {
             PlayerLogEntry playerLogEntry = (PlayerLogEntry)logReader.readNextEntry();
 
             assertEquals("2", playerLogEntry.getEntityId());
@@ -70,7 +70,7 @@ public class CreateGameEntryParserTest {
     @Test
     public void testCreateGame() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
             CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readNextEntry();
 
             GameEntityLogEntry gameEntityLogEntry = createGameLogEntry.getGameEntityLogEntry();
@@ -133,7 +133,7 @@ public class CreateGameEntryParserTest {
     @Test
     public void testCreateGameTwice() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame-twice.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, () -> new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
             assertEquals(CreateGameLogEntry.class, logReader.readNextEntry().getClass());
             assertEquals(CreateGameLogEntry.class, logReader.readNextEntry().getClass());
         }

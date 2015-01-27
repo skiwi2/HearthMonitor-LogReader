@@ -1,13 +1,11 @@
 package com.github.skiwi2.hearthmonitor.logreader;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
-import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryParsers;
-import com.github.skiwi2.hearthmonitor.logreader.logentries.ABDEntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.DLogEntry;
-import com.github.skiwi2.hearthmonitor.logreader.logentries.EmptyEntryParsers;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.EntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.InfiniteLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logreaders.ListLogReader;
 import org.junit.Test;
@@ -25,7 +23,7 @@ import static org.junit.Assert.*;
 public class AbstractLogReaderTest {
     @Test
     public void testReadNextEntryExpectedEntries() throws NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new ABCEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), EntryParsers.getABCEntryParsers());
 
         assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
         assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
@@ -33,7 +31,7 @@ public class AbstractLogReaderTest {
 
     @Test(expected = NoSuchElementException.class)
     public void testReadNextEntryNoMoreEntries() throws NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new ABCEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), EntryParsers.getABCEntryParsers());
 
         logReader.readNextEntry();
         logReader.readNextEntry();
@@ -42,7 +40,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testReadNextEntryNoReadersAvailable() {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), new EmptyEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), EntryParsers.getEmptyEntryParsers());
 
         try {
             logReader.readNextEntry();
@@ -55,7 +53,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testHasNextEntryNoEntries() {
-        LogReader logReader = new ListLogReader(Arrays.asList(), new ABCEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList(), EntryParsers.getABCEntryParsers());
 
         assertFalse(logReader.hasNextEntry());
         assertFalse(logReader.hasNextEntry());
@@ -63,7 +61,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testHasNextEntryOneEntry() {
-        LogReader logReader = new ListLogReader(Arrays.asList("A"), new ABCEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A"), EntryParsers.getABCEntryParsers());
 
         assertTrue(logReader.hasNextEntry());
         assertTrue(logReader.hasNextEntry());
@@ -71,7 +69,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testHasNextEntryWithReads() throws NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), new ABCEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), EntryParsers.getABCEntryParsers());
 
         assertTrue(logReader.hasNextEntry());
         assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
@@ -84,7 +82,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testReadNextEntrySpanningMultipleLines() throws NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "3", "B"), new ABDEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "3", "B"), EntryParsers.getABDEntryParsers());
 
         assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
         assertEquals(DLogEntry.class, logReader.readNextEntry().getClass());
@@ -93,7 +91,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testReadNextEntrySpanningMultipleLinesLastEntryNotReadable() throws NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "D", "1","2"), new ABDEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "D", "1","2"), EntryParsers.getABDEntryParsers());
 
         assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
         assertEquals(BLogEntry.class, logReader.readNextEntry().getClass());
@@ -108,7 +106,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testReadNextEntrySpanningMultipleLinesIncorrectInput() throws NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "4", "B"), new ABDEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "D", "1","2", "4", "B"), EntryParsers.getABDEntryParsers());
 
         assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
 
@@ -124,7 +122,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testReadNextEntryWithPeekingEntryReaders() throws NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "A", "A", "B", "1", "B", "1", "C", "C", "B", "1", "A", "C"), new ABCPeekEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "A", "A", "B", "1", "B", "1", "C", "C", "B", "1", "A", "C"), getABCPeekEntryParsers());
 
         assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
         assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
@@ -147,7 +145,7 @@ public class AbstractLogReaderTest {
 
     @Test
     public void testReadNextEntryInfiniteLogEntries() throws NotReadableException {
-        LogReader logReader = new ListLogReader(Arrays.asList("START", "1", "2", "3", "START", "START", "1", "2", "3", "4", "5"), new InfiniteReadPeekEntryParsers());
+        LogReader logReader = new ListLogReader(Arrays.asList("START", "1", "2", "3", "START", "START", "1", "2", "3", "4", "5"), getInfiniteReadPeekEntryParsers());
 
         LogEntry logEntry1 = logReader.readNextEntry();
         assertEquals(InfiniteLogEntry.class, logEntry1.getClass());
@@ -166,7 +164,7 @@ public class AbstractLogReaderTest {
     public void testReadNextEntryInfiniteLogEntriesFilterLines() throws NotReadableException {
         LogReader logReader = new ListLogReader(
             Arrays.asList("0", "START", "0", "0", "1", "2", "0", "3", "START", "0", "START", "0", "1", "0", "2", "0", "3", "0", "4", "0", "5", "0"),
-            new InfiniteReadPeekEntryParsers(),
+            getInfiniteReadPeekEntryParsers(),
             string -> !string.equals("0")
         );
 
@@ -183,85 +181,85 @@ public class AbstractLogReaderTest {
         assertEquals(Arrays.asList("1", "2", "3", "4", "5"), ((InfiniteLogEntry)logEntry3).getContent());
     }
 
-    private static class ABCPeekEntryParsers implements EntryParsers {
-        @Override
-        public Set<EntryParser> get() {
-            return new HashSet<>(Arrays.asList(
-                new EntryParser() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("A");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
-                        if (!input.equals("A")) {
-                            throw new NotParsableException();
-                        }
-                        lineReader.hasNextLine();
-                        return new ALogEntry();
-                    }
-                },
-                new EntryParser() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("B");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
-                        if (!input.equals("B")) {
-                            throw new NotParsableException();
-                        }
-                        if (!Objects.equals("1", lineReader.readNextLine())) {
-                            throw new NotParsableException();
-                        }
-                        lineReader.hasNextLine();
-                        return new BLogEntry();
-                    }
-                },
-                new EntryParser() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("C");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
-                        if (!input.equals("C")) {
-                            throw new NotParsableException();
-                        }
-                        lineReader.hasNextLine();
-                        return new CLogEntry();
-                    }
+    private static final Set<EntryParser> ABC_PEEK_ENTRY_PARSERS =
+        new HashSet<>(Arrays.asList(
+            new EntryParser() {
+                @Override
+                public boolean isParsable(String input) {
+                    return input.equals("A");
                 }
-            ));
-        }
+
+                @Override
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
+                    if (!input.equals("A")) {
+                        throw new NotParsableException();
+                    }
+                    lineReader.hasNextLine();
+                    return new ALogEntry();
+                }
+            },
+            new EntryParser() {
+                @Override
+                public boolean isParsable(String input) {
+                    return input.equals("B");
+                }
+
+                @Override
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
+                    if (!input.equals("B")) {
+                        throw new NotParsableException();
+                    }
+                    if (!Objects.equals("1", lineReader.readNextLine())) {
+                        throw new NotParsableException();
+                    }
+                    lineReader.hasNextLine();
+                    return new BLogEntry();
+                }
+            },
+            new EntryParser() {
+                @Override
+                public boolean isParsable(String input) {
+                    return input.equals("C");
+                }
+
+                @Override
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
+                    if (!input.equals("C")) {
+                        throw new NotParsableException();
+                    }
+                    lineReader.hasNextLine();
+                    return new CLogEntry();
+                }
+            }
+        ));
+
+    private static Set<EntryParser> getABCPeekEntryParsers() {
+        return new HashSet<>(ABC_PEEK_ENTRY_PARSERS);
     }
 
-    private static class InfiniteReadPeekEntryParsers implements EntryParsers {
-        @Override
-        public Set<EntryParser> get() {
-            return new HashSet<>(Arrays.asList(
-                new EntryParser() {
-                    @Override
-                    public boolean isParsable(String input) {
-                        return input.equals("START");
-                    }
-
-                    @Override
-                    public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
-                        if (!input.equals("START")) {
-                            throw new NotParsableException();
-                        }
-                        List<String> content = new ArrayList<>();
-                        while (lineReader.nextLineMatches(line -> !line.equals("START"))) {
-                            content.add(lineReader.readNextLine());
-                        }
-                        return new InfiniteLogEntry(content);
-                    }
+    private static final Set<EntryParser> INFINITE_READ_PEEK_ENTRY_PARSERS =
+        new HashSet<>(Arrays.asList(
+            new EntryParser() {
+                @Override
+                public boolean isParsable(String input) {
+                    return input.equals("START");
                 }
-            ));
-        }
+
+                @Override
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
+                    if (!input.equals("START")) {
+                        throw new NotParsableException();
+                    }
+                    List<String> content = new ArrayList<>();
+                    while (lineReader.nextLineMatches(line -> !line.equals("START"))) {
+                        content.add(lineReader.readNextLine());
+                    }
+                    return new InfiniteLogEntry(content);
+                }
+            }
+        ));
+
+    private static Set<EntryParser> getInfiniteReadPeekEntryParsers() {
+        return new HashSet<>(INFINITE_READ_PEEK_ENTRY_PARSERS);
     }
 }

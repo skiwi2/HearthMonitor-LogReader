@@ -2,11 +2,12 @@ package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
 import com.github.skiwi2.hearthmonitor.logreader.AbstractLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.EntryParsers;
+import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -21,10 +22,10 @@ public class FileLogReader extends AbstractLogReader implements CloseableLogRead
      * Constructs a new FileLogReader instance.
      *
      * @param bufferedReader    The buffered reader from which to read
-     * @param entryParsers  The supplier of a set of entry parsers
-     * @throws  java.lang.NullPointerException  If bufferedReader or entryParsers.get() is null.
+     * @param entryParsers  The set of entry parsers
+     * @throws  java.lang.NullPointerException  If bufferedReader or entryParsers is null.
      */
-    public FileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers) {
+    public FileLogReader(final BufferedReader bufferedReader, final Set<EntryParser> entryParsers) {
         super(entryParsers, bufferedReader.lines().iterator());
         this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
     }
@@ -35,11 +36,11 @@ public class FileLogReader extends AbstractLogReader implements CloseableLogRead
      * The filter predicate can be used to filter the lines you want to traverse.
      *
      * @param bufferedReader    The buffered reader from which to read
-     * @param entryParsers  The supplier of a set of entry parsers
+     * @param entryParsers  The set of entry parsers
      * @param filterPredicate   The predicate to filter the lines with
-     * @throws  java.lang.NullPointerException  If bufferedReader, filterPredicate or entryParsers.get() is null.
+     * @throws  java.lang.NullPointerException  If bufferedReader, filterPredicate or entryParsers is null.
      */
-    public FileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers, final Predicate<? super String> filterPredicate) {
+    public FileLogReader(final BufferedReader bufferedReader, final Set<EntryParser> entryParsers, final Predicate<? super String> filterPredicate) {
         super(entryParsers, bufferedReader.lines().iterator(), filterPredicate);
         this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
     }

@@ -2,10 +2,10 @@ package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.EntryParsers;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -31,7 +31,7 @@ public class MonitoringFileLogReaderTest {
     public void testConstructorPECS() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
         Predicate<Object> predicate = obj -> true;
-        try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryParsers(), predicate)) {
+        try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, EntryParsers.getABCEntryParsers(), predicate)) {
             assertNotNull(logReader);
         }
     }
@@ -45,7 +45,7 @@ public class MonitoringFileLogReaderTest {
         Thread thread = new Thread(() -> {
             try {
                 BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
-                try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryParsers())) {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, EntryParsers.getABCEntryParsers())) {
 
                     assertTrue(logReader.hasNextEntry());
                     logEntries.add(logReader.readNextEntry());
@@ -93,7 +93,7 @@ public class MonitoringFileLogReaderTest {
         Thread thread = new Thread(() -> {
             try {
                 BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test-filter.log").toURI()), StandardCharsets.UTF_8);
-                try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, new ABCEntryParsers(), string -> !string.equals("0"))) {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(bufferedReader, EntryParsers.getABCEntryParsers(), string -> !string.equals("0"))) {
 
                     assertTrue(logReader.hasNextEntry());
                     logEntries.add(logReader.readNextEntry());
@@ -147,7 +147,7 @@ public class MonitoringFileLogReaderTest {
 
         Thread thread = new Thread(() -> {
             try {
-                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryParsers())) {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), EntryParsers.getABCEntryParsers())) {
 
                     assertTrue(logReader.hasNextEntry());
                     logReader.readNextEntry();
@@ -200,7 +200,7 @@ public class MonitoringFileLogReaderTest {
 
         Thread thread = new Thread(() -> {
             try {
-                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryParsers())) {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), EntryParsers.getABCEntryParsers())) {
                     assertTrue(logReader.hasNextEntry());
                     logEntries.add(logReader.readNextEntry());
 
@@ -267,7 +267,7 @@ public class MonitoringFileLogReaderTest {
 
         Thread thread = new Thread(() -> {
             try {
-                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), new ABCEntryParsers(), string -> !string.equals("0"))) {
+                try (CloseableLogReader logReader = new MonitoringFileLogReader(Files.newBufferedReader(logFile, StandardCharsets.UTF_8), EntryParsers.getABCEntryParsers(), string -> !string.equals("0"))) {
                     assertTrue(logReader.hasNextEntry());
                     logEntries.add(logReader.readNextEntry());
 

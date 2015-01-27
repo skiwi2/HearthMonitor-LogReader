@@ -1,10 +1,10 @@
 package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.logentries.ABCEntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.ALogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.BLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.logentries.CLogEntry;
+import com.github.skiwi2.hearthmonitor.logreader.logentries.EntryParsers;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -21,7 +21,7 @@ public class FileLogReaderTest {
     public void testConstructorPECS() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
         Predicate<Object> predicate = obj -> true;
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers(), predicate)) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, EntryParsers.getABCEntryParsers(), predicate)) {
             assertNotNull(logReader);
         }
     }
@@ -29,7 +29,7 @@ public class FileLogReaderTest {
     @Test
     public void testReadEntry() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers())) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, EntryParsers.getABCEntryParsers())) {
 
             assertTrue(logReader.hasNextEntry());
             assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
@@ -47,7 +47,7 @@ public class FileLogReaderTest {
     @Test
     public void testReadEntryFilterLines() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test-filter.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers(), string -> !string.equals("0"))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, EntryParsers.getABCEntryParsers(), string -> !string.equals("0"))) {
 
             assertTrue(logReader.hasNextEntry());
             assertEquals(ALogEntry.class, logReader.readNextEntry().getClass());
@@ -65,7 +65,7 @@ public class FileLogReaderTest {
     @Test(expected = NoSuchElementException.class)
     public void testReadEntryNoMoreInput() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new ABCEntryParsers())) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, EntryParsers.getABCEntryParsers())) {
 
             logReader.readNextEntry();
             logReader.readNextEntry();

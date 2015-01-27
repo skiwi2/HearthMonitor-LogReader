@@ -2,7 +2,6 @@ package com.github.skiwi2.hearthmonitor.logreader.logentries;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
-import com.github.skiwi2.hearthmonitor.logreader.EntryParsers;
 import com.github.skiwi2.hearthmonitor.logreader.LineReader;
 import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
 
@@ -14,10 +13,63 @@ import java.util.Set;
 /**
  * @author Frank van Heeswijk
  */
-public class ABDEntryParsers implements EntryParsers {
-    @Override
-    public Set<EntryParser> get() {
-        return new HashSet<>(Arrays.asList(
+public final class EntryParsers {
+    private EntryParsers() {
+        throw new UnsupportedOperationException();
+    }
+
+    private static final Set<EntryParser> ABC_ENTRY_PARSERS =
+        new HashSet<>(Arrays.asList(
+            new EntryParser() {
+                @Override
+                public boolean isParsable(String input) {
+                    return input.equals("A");
+                }
+
+                @Override
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
+                    if (!input.startsWith("A")) {
+                        throw new NotParsableException();
+                    }
+                    return new ALogEntry();
+                }
+            },
+            new EntryParser() {
+                @Override
+                public boolean isParsable(String input) {
+                    return input.equals("B");
+                }
+
+                @Override
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
+                    if (!input.startsWith("B")) {
+                        throw new NotParsableException();
+                    }
+                    return new BLogEntry();
+                }
+            },
+            new EntryParser() {
+                @Override
+                public boolean isParsable(String input) {
+                    return input.equals("C");
+                }
+
+                @Override
+                public LogEntry parse(String input, LineReader lineReader) throws NotParsableException {
+                    if (!input.startsWith("C")) {
+                        throw new NotParsableException();
+                    }
+                    return new CLogEntry();
+                }
+            }
+        ));
+
+    public static Set<EntryParser> getABCEntryParsers() {
+        return new HashSet<>(ABC_ENTRY_PARSERS);
+    }
+
+    private static final Set<EntryParser> ABD_ENTRY_PARSERS =
+        new HashSet<>(Arrays.asList(
             new EntryParser() {
                 @Override
                 public boolean isParsable(String input) {
@@ -70,5 +122,12 @@ public class ABDEntryParsers implements EntryParsers {
                 }
             }
         ));
+
+    public static Set<EntryParser> getABDEntryParsers() {
+        return new HashSet<>(ABD_ENTRY_PARSERS);
+    }
+
+    public static Set<EntryParser> getEmptyEntryParsers() {
+        return new HashSet<>();
     }
 }

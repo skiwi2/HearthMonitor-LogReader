@@ -24,15 +24,15 @@ public abstract class AbstractLogReader implements LogReader {
     /**
      * Initializes an AbstractLogReader instance.
      *
-     * @param entryParsers  The supplier of a set of entry parsers
+     * @param entryParsers  The set of entry parsers
      * @param readIterator  The iterator used to read lines from the log source
      * @param filterPredicate   The predicate to use to filter the lines read from the log source
-     * @throws  java.lang.NullPointerException  If entryParsers.get() returns null or if readIterator or filterPredicate is null.
+     * @throws  java.lang.NullPointerException  If entryParsers, readIterator or filterPredicate is null.
      */
-    protected AbstractLogReader(final EntryParsers entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
+    protected AbstractLogReader(final Set<EntryParser> entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
         Objects.requireNonNull(filterPredicate, "filterPredicate");
         Objects.requireNonNull(readIterator, "readIterator");
-        this.entryParsers = Objects.requireNonNull(entryParsers.get(), "entryParsers.get()");
+        this.entryParsers = Objects.requireNonNull(entryParsers, "entryParsers");
         Iterator<String> filteredIterator = IteratorUtils.filteredIterator(readIterator, filterPredicate);
         this.matchingIterator = MatchingIterator.fromIterator(filteredIterator);
     }
@@ -40,11 +40,11 @@ public abstract class AbstractLogReader implements LogReader {
     /**
      * Initializes an AbstractLogReader instance without a filter predicate defined.
      *
-     * @param entryParsers  The supplier of a set of entry parsers
+     * @param entryParsers  The set of entry parsers
      * @param readIterator  The iterator used to read lines from the log source
      * @throws  java.lang.NullPointerException  If entryParsers.get() returns null or if readIterator is null.
      */
-    protected AbstractLogReader(final EntryParsers entryParsers, final Iterator<String> readIterator) {
+    protected AbstractLogReader(final Set<EntryParser> entryParsers, final Iterator<String> readIterator) {
         this(entryParsers, readIterator, string -> true);
     }
 

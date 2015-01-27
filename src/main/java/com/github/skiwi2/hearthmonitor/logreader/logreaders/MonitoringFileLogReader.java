@@ -2,7 +2,7 @@ package com.github.skiwi2.hearthmonitor.logreader.logreaders;
 
 import com.github.skiwi2.hearthmonitor.logreader.AbstractLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
-import com.github.skiwi2.hearthmonitor.logreader.EntryParsers;
+import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.io.UncheckedIOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -24,10 +25,10 @@ public class MonitoringFileLogReader extends AbstractLogReader implements Closea
      * Constructs a new MonitoringFileLogReader instance.
      *
      * @param bufferedReader    The buffered reader from which to read
-     * @param entryParsers  The supplier of a set of entry parsers
-     * @throws  java.lang.NullPointerException  If bufferedReader or entryParsers.get() is null.
+     * @param entryParsers  The set of entry parsers
+     * @throws  java.lang.NullPointerException  If bufferedReader or entryParsers is null.
      */
-    public MonitoringFileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers) {
+    public MonitoringFileLogReader(final BufferedReader bufferedReader, final Set<EntryParser> entryParsers) {
         super(entryParsers, createReadIterator(bufferedReader));
         this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
     }
@@ -38,11 +39,11 @@ public class MonitoringFileLogReader extends AbstractLogReader implements Closea
      * The filter predicate can be used to filter the lines you want to traverse.
      *
      * @param bufferedReader    The buffered reader from which to read
-     * @param entryParsers  The supplier of a set of entry parsers
+     * @param entryParsers  The set of entry parsers
      * @param filterPredicate   The predicate to filter the lines with
-     * @throws  java.lang.NullPointerException  If bufferedReader, filterPredicate or entryParsers.get() is null.
+     * @throws  java.lang.NullPointerException  If bufferedReader, filterPredicate or entryParsers is null.
      */
-    public MonitoringFileLogReader(final BufferedReader bufferedReader, final EntryParsers entryParsers, final Predicate<? super String> filterPredicate) {
+    public MonitoringFileLogReader(final BufferedReader bufferedReader, final Set<EntryParser> entryParsers, final Predicate<? super String> filterPredicate) {
         super(entryParsers, createReadIterator(bufferedReader), filterPredicate);
         this.bufferedReader = Objects.requireNonNull(bufferedReader, "bufferedReader");
     }

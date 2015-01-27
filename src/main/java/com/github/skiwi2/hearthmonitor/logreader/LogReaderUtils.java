@@ -2,6 +2,7 @@ package com.github.skiwi2.hearthmonitor.logreader;
 
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Predicate;
@@ -28,10 +29,10 @@ public final class LogReaderUtils {
      * @param input The input line
      * @param extraLineReader    The extra line reader
      * @param extraReadCondition The extra read condition
-     * @param entryParsers  The supplier of a set of entry parsers
+     * @param entryParsers  The set of entry parsers
      * @return  A new LogReader that can read log entries from the input string, the LineReader for the extra lines and the read condition.
      */
-    public static LogReader fromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<? super String> extraReadCondition, final EntryParsers entryParsers) {
+    public static LogReader fromInputAndExtraLineReader(final String input, final LineReader extraLineReader, final Predicate<? super String> extraReadCondition, final Set<EntryParser> entryParsers) {
         Objects.requireNonNull(extraLineReader, "extraLineReader");
         Objects.requireNonNull(extraReadCondition, "extraReadCondition");
         Objects.requireNonNull(entryParsers, "entryParsers");
