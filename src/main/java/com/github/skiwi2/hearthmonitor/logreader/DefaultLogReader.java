@@ -3,6 +3,7 @@ package com.github.skiwi2.hearthmonitor.logreader;
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,9 +33,10 @@ public class DefaultLogReader implements LogReader {
      * @throws  java.lang.NullPointerException  If entryParsers, readIterator or filterPredicate is null.
      */
     protected DefaultLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
-        Objects.requireNonNull(filterPredicate, "filterPredicate");
+        Objects.requireNonNull(entryParsers, "entryParsers");
         Objects.requireNonNull(readIterator, "readIterator");
-        this.entryParsers = Objects.requireNonNull(entryParsers, "entryParsers");
+        Objects.requireNonNull(filterPredicate, "filterPredicate");
+        this.entryParsers = new HashSet<>(entryParsers);
         Iterator<String> filteredIterator = IteratorUtils.filteredIterator(readIterator, filterPredicate);
         this.matchingIterator = MatchingIterator.fromIterator(filteredIterator);
     }
