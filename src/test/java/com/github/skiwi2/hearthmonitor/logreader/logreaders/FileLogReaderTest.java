@@ -20,8 +20,16 @@ public class FileLogReaderTest {
     @Test
     public void testConstructorPECS() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, EntryParsers.getABExtendedEntryParsers())) {
+            assertNotNull(logReader);
+        }
+    }
+
+    @Test
+    public void testConstructorWithFilterPredicatePECS() throws Exception {
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("test.log").toURI()), StandardCharsets.UTF_8);
         Predicate<Object> predicate = obj -> true;
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, EntryParsers.getABCEntryParsers(), predicate)) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, EntryParsers.getABExtendedEntryParsers(), predicate)) {
             assertNotNull(logReader);
         }
     }

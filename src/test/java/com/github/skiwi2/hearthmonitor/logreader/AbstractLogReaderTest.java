@@ -13,14 +13,33 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
 public class AbstractLogReaderTest {
+    @Test
+    public void testConstructorPECS() {
+        Iterator<String> iterator = Arrays.<String>asList().iterator();
+        LogReader logReader = new AbstractLogReader(EntryParsers.getABExtendedEntryParsers(), iterator) { };
+
+        assertNotNull(logReader);
+    }
+
+    @Test
+    public void testConstructorWithFilterPredicatePECS() {
+        Iterator<String> iterator = Arrays.<String>asList().iterator();
+        Predicate<Object> filterPredicate = obj -> true;
+        LogReader logReader = new AbstractLogReader(EntryParsers.getABExtendedEntryParsers(), iterator, filterPredicate) { };
+
+        assertNotNull(logReader);
+    }
+
     @Test
     public void testReadNextEntryExpectedEntries() throws NotReadableException {
         LogReader logReader = new ListLogReader(Arrays.asList("A", "B"), EntryParsers.getABCEntryParsers());

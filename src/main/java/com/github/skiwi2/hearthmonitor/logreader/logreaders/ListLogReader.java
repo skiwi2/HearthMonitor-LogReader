@@ -23,7 +23,7 @@ public class ListLogReader extends AbstractLogReader {
      * @param entryParsers  The set of entry parsers
      * @throws  java.lang.NullPointerException  If inputList or entryParsers is null.
      */
-    public ListLogReader(final List<String> inputList, final Set<EntryParser> entryParsers) {
+    public ListLogReader(final List<String> inputList, final Set<? extends EntryParser> entryParsers) {
         super(entryParsers, new ArrayList<>(inputList).iterator());
     }
 
@@ -38,7 +38,7 @@ public class ListLogReader extends AbstractLogReader {
      * @param filterPredicate   The predicate to filter the lines with
      * @throws  java.lang.NullPointerException  If inputList, filterPredicate or entryParsers is null.
      */
-    public ListLogReader(final List<String> inputList, final Set<EntryParser> entryParsers, final Predicate<? super String> filterPredicate) {
+    public ListLogReader(final List<String> inputList, final Set<? extends EntryParser> entryParsers, final Predicate<? super String> filterPredicate) {
         super(entryParsers, new ArrayList<>(inputList).iterator(), filterPredicate);
     }
 }

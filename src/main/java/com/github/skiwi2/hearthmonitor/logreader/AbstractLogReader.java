@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  * @author Frank van Heeswijk
  */
 public abstract class AbstractLogReader implements LogReader {
-    private final Set<EntryParser> entryParsers;
+    private final Set<? extends EntryParser> entryParsers;
     private final MatchingIterator<String> matchingIterator;
 
     private final List<String> linesInMemory = new ArrayList<>();
@@ -29,7 +29,7 @@ public abstract class AbstractLogReader implements LogReader {
      * @param filterPredicate   The predicate to use to filter the lines read from the log source
      * @throws  java.lang.NullPointerException  If entryParsers, readIterator or filterPredicate is null.
      */
-    protected AbstractLogReader(final Set<EntryParser> entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
+    protected AbstractLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator, final Predicate<? super String> filterPredicate) {
         Objects.requireNonNull(filterPredicate, "filterPredicate");
         Objects.requireNonNull(readIterator, "readIterator");
         this.entryParsers = Objects.requireNonNull(entryParsers, "entryParsers");
@@ -44,7 +44,7 @@ public abstract class AbstractLogReader implements LogReader {
      * @param readIterator  The iterator used to read lines from the log source
      * @throws  java.lang.NullPointerException  If entryParsers.get() returns null or if readIterator is null.
      */
-    protected AbstractLogReader(final Set<EntryParser> entryParsers, final Iterator<String> readIterator) {
+    protected AbstractLogReader(final Set<? extends EntryParser> entryParsers, final Iterator<String> readIterator) {
         this(entryParsers, readIterator, string -> true);
     }
 

@@ -17,8 +17,15 @@ import static org.junit.Assert.*;
 public class ListLogReaderTest {
     @Test
     public void testConstructorPECS() {
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), EntryParsers.getABExtendedEntryParsers());
+
+        assertNotNull(logReader);
+    }
+
+    @Test
+    public void testConstructorWithFilterPredicatePECS() {
         Predicate<Object> predicate = obj -> true;
-        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), EntryParsers.getABCEntryParsers(), predicate);
+        LogReader logReader = new ListLogReader(Arrays.asList("A", "B", "C"), EntryParsers.getABExtendedEntryParsers(), predicate);
 
         assertNotNull(logReader);
     }

@@ -130,4 +130,14 @@ public final class EntryParsers {
     public static Set<EntryParser> getEmptyEntryParsers() {
         return new HashSet<>();
     }
+
+    private static final Set<ExtendedEntryParser> AB_EXTENDED_ENTRY_PARSERS =
+        new HashSet<>(Arrays.asList(
+            new AExtendedEntryParser(),
+            new BExtendedEntryParser()
+        ));
+
+    public static Set<ExtendedEntryParser> getABExtendedEntryParsers() {
+        return new HashSet<>(AB_EXTENDED_ENTRY_PARSERS);
+    }
 }
