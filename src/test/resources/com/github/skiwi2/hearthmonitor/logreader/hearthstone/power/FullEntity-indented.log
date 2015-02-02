@@ -1,0 +1,8 @@
+[Power] GameState.DebugPrintPower() -     FULL_ENTITY - Creating ID=4 CardID=HERO_07
+[Power] GameState.DebugPrintPower() -         tag=HEALTH value=30
+[Power] GameState.DebugPrintPower() -         tag=ZONE value=PLAY
+[Power] GameState.DebugPrintPower() -         tag=CONTROLLER value=1
+[Power] GameState.DebugPrintPower() -         tag=ENTITY_ID value=4
+[Power] GameState.DebugPrintPower() -         tag=FACTION value=NEUTRAL
+[Power] GameState.DebugPrintPower() -         tag=CARDTYPE value=HERO
+[Power] GameState.DebugPrintPower() -         tag=RARITY value=FREE

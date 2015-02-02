@@ -26,6 +26,7 @@ public class CreateGameEntryParserTest {
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new GameEntityEntryParser())))) {
             GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readNextEntry();
 
+            assertEquals(4, gameEntityLogEntry.getIndentation());
             assertEquals("1", gameEntityLogEntry.getEntityId());
 
             assertEquals("85", gameEntityLogEntry.getTagValue("10"));
@@ -44,6 +45,7 @@ public class CreateGameEntryParserTest {
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new PlayerEntryParser())))) {
             PlayerLogEntry playerLogEntry = (PlayerLogEntry)logReader.readNextEntry();
 
+            assertEquals(4, playerLogEntry.getIndentation());
             assertEquals("2", playerLogEntry.getEntityId());
             assertEquals("1", playerLogEntry.getPlayerId());
             assertEquals("144115198130930503", playerLogEntry.getGameAccountId().getHi());
@@ -73,8 +75,11 @@ public class CreateGameEntryParserTest {
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
             CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readNextEntry();
 
+            assertEquals(0, createGameLogEntry.getIndentation());
+
             GameEntityLogEntry gameEntityLogEntry = createGameLogEntry.getGameEntityLogEntry();
 
+            assertEquals(4, gameEntityLogEntry.getIndentation());
             assertEquals("1", gameEntityLogEntry.getEntityId());
 
             assertEquals("85", gameEntityLogEntry.getTagValue("10"));
@@ -88,6 +93,7 @@ public class CreateGameEntryParserTest {
             PlayerLogEntry playerLogEntry1 = getPlayerLogEntryByPlayerId("1", createGameLogEntry.getPlayerLogEntries());
             PlayerLogEntry playerLogEntry2 = getPlayerLogEntryByPlayerId("2", createGameLogEntry.getPlayerLogEntries());
 
+            assertEquals(4, playerLogEntry1.getIndentation());
             assertEquals("2", playerLogEntry1.getEntityId());
             assertEquals("1", playerLogEntry1.getPlayerId());
             assertEquals("144115198130930503", playerLogEntry1.getGameAccountId().getHi());
@@ -109,6 +115,75 @@ public class CreateGameEntryParserTest {
             assertEquals("PLAYER", playerLogEntry1.getTagValue("CARDTYPE"));
             assertEquals("1", playerLogEntry1.getTagValue("NUM_TURNS_LEFT"));
 
+            assertEquals(4, playerLogEntry2.getIndentation());
+            assertEquals("3", playerLogEntry2.getEntityId());
+            assertEquals("2", playerLogEntry2.getPlayerId());
+            assertEquals("144115198130930503", playerLogEntry2.getGameAccountId().getHi());
+            assertEquals("37543301", playerLogEntry2.getGameAccountId().getLo());
+
+            assertEquals("75", playerLogEntry2.getTagValue("TIMEOUT"));
+            assertEquals("PLAYING", playerLogEntry2.getTagValue("PLAYSTATE"));
+            assertEquals("36", playerLogEntry2.getTagValue("HERO_ENTITY"));
+            assertEquals("10", playerLogEntry2.getTagValue("MAXHANDSIZE"));
+            assertEquals("4", playerLogEntry2.getTagValue("STARTHANDSIZE"));
+            assertEquals("2", playerLogEntry2.getTagValue("PLAYER_ID"));
+            assertEquals("2", playerLogEntry2.getTagValue("TEAM_ID"));
+            assertEquals("PLAY", playerLogEntry2.getTagValue("ZONE"));
+            assertEquals("2", playerLogEntry2.getTagValue("CONTROLLER"));
+            assertEquals("3", playerLogEntry2.getTagValue("ENTITY_ID"));
+            assertEquals("10", playerLogEntry2.getTagValue("MAXRESOURCES"));
+            assertEquals("PLAYER", playerLogEntry2.getTagValue("CARDTYPE"));
+            assertEquals("1", playerLogEntry2.getTagValue("NUM_TURNS_LEFT"));
+        }
+    }
+
+    @Test
+    public void testCreateGameIndented() throws Exception {
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame-indented.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
+            CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readNextEntry();
+
+            assertEquals(4, createGameLogEntry.getIndentation());
+
+            GameEntityLogEntry gameEntityLogEntry = createGameLogEntry.getGameEntityLogEntry();
+
+            assertEquals(8, gameEntityLogEntry.getIndentation());
+            assertEquals("1", gameEntityLogEntry.getEntityId());
+
+            assertEquals("85", gameEntityLogEntry.getTagValue("10"));
+            assertEquals("1", gameEntityLogEntry.getTagValue("TURN"));
+            assertEquals("PLAY", gameEntityLogEntry.getTagValue("ZONE"));
+            assertEquals("1", gameEntityLogEntry.getTagValue("ENTITY_ID"));
+            assertEquals("BEGIN_MULLIGAN", gameEntityLogEntry.getTagValue("NEXT_STEP"));
+            assertEquals("GAME", gameEntityLogEntry.getTagValue("CARDTYPE"));
+            assertEquals("RUNNING", gameEntityLogEntry.getTagValue("STATE"));
+
+            PlayerLogEntry playerLogEntry1 = getPlayerLogEntryByPlayerId("1", createGameLogEntry.getPlayerLogEntries());
+            PlayerLogEntry playerLogEntry2 = getPlayerLogEntryByPlayerId("2", createGameLogEntry.getPlayerLogEntries());
+
+            assertEquals(8, playerLogEntry1.getIndentation());
+            assertEquals("2", playerLogEntry1.getEntityId());
+            assertEquals("1", playerLogEntry1.getPlayerId());
+            assertEquals("144115198130930503", playerLogEntry1.getGameAccountId().getHi());
+            assertEquals("27162067", playerLogEntry1.getGameAccountId().getLo());
+
+            assertEquals("75", playerLogEntry1.getTagValue("TIMEOUT"));
+            assertEquals("PLAYING", playerLogEntry1.getTagValue("PLAYSTATE"));
+            assertEquals("1", playerLogEntry1.getTagValue("CURRENT_PLAYER"));
+            assertEquals("1", playerLogEntry1.getTagValue("FIRST_PLAYER"));
+            assertEquals("4", playerLogEntry1.getTagValue("HERO_ENTITY"));
+            assertEquals("10", playerLogEntry1.getTagValue("MAXHANDSIZE"));
+            assertEquals("4", playerLogEntry1.getTagValue("STARTHANDSIZE"));
+            assertEquals("1", playerLogEntry1.getTagValue("PLAYER_ID"));
+            assertEquals("1", playerLogEntry1.getTagValue("TEAM_ID"));
+            assertEquals("PLAY", playerLogEntry1.getTagValue("ZONE"));
+            assertEquals("1", playerLogEntry1.getTagValue("CONTROLLER"));
+            assertEquals("2", playerLogEntry1.getTagValue("ENTITY_ID"));
+            assertEquals("10", playerLogEntry1.getTagValue("MAXRESOURCES"));
+            assertEquals("PLAYER", playerLogEntry1.getTagValue("CARDTYPE"));
+            assertEquals("1", playerLogEntry1.getTagValue("NUM_TURNS_LEFT"));
+
+            assertEquals(8, playerLogEntry2.getIndentation());
             assertEquals("3", playerLogEntry2.getEntityId());
             assertEquals("2", playerLogEntry2.getPlayerId());
             assertEquals("144115198130930503", playerLogEntry2.getGameAccountId().getHi());

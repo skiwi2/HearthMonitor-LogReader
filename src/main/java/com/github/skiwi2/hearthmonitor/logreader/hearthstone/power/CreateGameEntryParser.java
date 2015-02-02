@@ -67,9 +67,18 @@ public class CreateGameEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() -         tag=NUM_TURNS_LEFT value=1
      */
 
+    /**
+     * Pattern that checks if a string matches the following:
+     *  - starts with literal text '[Power] GameState.DebugPrintPower() - '
+     *  - followed by zero or more space characters, captured as the 1st group
+     *  - ending with literal text 'CREATE_GAME'
+     */
+    private static final Pattern EXTRACT_CREATE_GAME_PATTERN =
+        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - ") + "(\\s*)" + Pattern.quote("CREATE_GAME") + "$");
+
     @Override
     public boolean isParsable(final String input) {
-        return input.equals("[Power] GameState.DebugPrintPower() - CREATE_GAME");
+        return EXTRACT_CREATE_GAME_PATTERN.matcher(input).matches();
     }
 
     @Override
@@ -87,6 +96,14 @@ public class CreateGameEntryParser implements EntryParser {
 
         try {
             CreateGameLogEntry.Builder builder = new CreateGameLogEntry.Builder();
+
+            Matcher createGameLogEntryMatcher = EXTRACT_CREATE_GAME_PATTERN.matcher(input);
+            if (!createGameLogEntryMatcher.find()) {
+                throw new NotParsableException();
+            }
+            int indentation = createGameLogEntryMatcher.group(1).length();
+            builder.indentation(indentation);
+
             GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readNextEntry();
             builder.gameEntityLogEntry(gameEntityLogEntry);
 
@@ -116,28 +133,32 @@ public class CreateGameEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() -         tag=STATE value=RUNNING
      */
 
+        /**
+         * Pattern that checks if a string matches the following:
+         *   - starts with literal text '[Power] GameState.DebugPrintPower() - '
+         *   - followed by zero or more space characters, captured as the 1st group
+         *   - followed by literal text 'GameEntity EntityID='
+         *   - ending with zero or more characters, captured as the 2nd group
+         */
+        private static final Pattern EXTRACT_GAME_ENTITY_PATTERN =
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - ") + "(\\s*)" + Pattern.quote("GameEntity EntityID=") + "(.*)$");
+
         @Override
         public boolean isParsable(final String input) {
-            return input.startsWith("[Power] GameState.DebugPrintPower() -     GameEntity");
+            return EXTRACT_GAME_ENTITY_PATTERN.matcher(input).matches();
         }
 
         /**
          * Pattern that checks if a string matches the following:
-         *   - starts with literal text '[Power] GameState.DebugPrintPower() -     GameEntity EntityID='
-         *   - ending with zero or more characters, captured as the 1st group
-         */
-        private static final Pattern EXTRACT_GAME_ENTITY_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     GameEntity EntityID=") + "(.*)$");
-
-        /**
-         * Pattern that checks if a string matches the following:
-         *   - starts with literal text '[Power] GameState.DebugPrintPower() -         tag='
-         *   - followed by zero or more characters, captured as the 1st group
+         *   - starts with literal text '[Power] GameState.DebugPrintPower() - '
+         *   - followed by four or more space characters, captured as the 1st group
+         *   - followed by literal text 'tag='
+         *   - followed by zero or more characters, captured as the 2nd group
          *   - followed by literal text ' value='
-         *   - ending with zero or more characters, captured as the 2nd group
+         *   - ending with zero or more characters, captured as the 3rd group
          */
         private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - ") + "(\\s{4,})" + Pattern.quote("tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
 
         @Override
         public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
@@ -147,19 +168,26 @@ public class CreateGameEntryParser implements EntryParser {
             if (!gameEntityMatcher.find()) {
                 throw new NotParsableException();
             }
-            String entityId = gameEntityMatcher.group(1);
+            int indentation = gameEntityMatcher.group(1).length();
+            String entityId = gameEntityMatcher.group(2);
+            builder.indentation(indentation);
             builder.entityId(entityId);
 
             Predicate<String> readCondition = line -> (LogLineUtils.isFromNamedLogger(line) &&
-                (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > 4));
+                (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation));
 
             while (lineReader.nextLineMatches(readCondition)) {
                 Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
                 if (!tagValueMatcher.find()) {
                     throw new NotParsableException();
                 }
-                String tag = tagValueMatcher.group(1);
-                String value = tagValueMatcher.group(2);
+                int tagValueIndentation = tagValueMatcher.group(1).length();
+                if (tagValueIndentation < indentation + 4) {
+                    //expect tag value pairs to be indented by 4 more than the parent game entity
+                    throw new NotParsableException();
+                }
+                String tag = tagValueMatcher.group(2);
+                String value = tagValueMatcher.group(3);
                 builder.addTagValuePair(tag, value);
             }
 
@@ -190,38 +218,42 @@ public class CreateGameEntryParser implements EntryParser {
          * [Power] GameState.DebugPrintPower() -         tag=NUM_TURNS_LEFT value=1
          */
 
-        @Override
-        public boolean isParsable(final String input) {
-            return input.startsWith("[Power] GameState.DebugPrintPower() -     Player");
-        }
-
         /**
          * Pattern that checks if a string matches the following:
-         *   - starts with literal text '[Power] GameState.DebugPrintPower() -     Player EntityID='
-         *   - followed by zero or more characters, captured as the 1st group
-         *   - followed by literal text ' PlayerID='
+         *   - starts with literal text '[Power] GameState.DebugPrintPower() - '
+         *   - followed by zero or more space characters, captured as the 1st group
+         *   - followed by literal text 'Player EntityID='
          *   - followed by zero or more characters, captured as the 2nd group
-         *   - followed by literal text ' GameAccountId=[hi='
+         *   - followed by literal text ' PlayerID='
          *   - followed by zero or more characters, captured as the 3rd group
-         *   - followed by literal text ' lo='
+         *   - followed by literal text ' GameAccountId=[hi='
          *   - followed by zero or more characters, captured as the 4th group
+         *   - followed by literal text ' lo='
+         *   - followed by zero or more characters, captured as the 5th group
          *   - followed by the literal text ']'
          *   - ending with zero or more characters
          */
         private static final Pattern EXTRACT_PLAYER_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     Player EntityID=") + "(.*)"
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - ") + "(\\s*)" + Pattern.compile("Player EntityID=") + "(.*)"
                 + Pattern.quote(" PlayerID=") + "(.*)" + Pattern.quote(" GameAccountId=[hi=") + "(.*)" + Pattern.quote(" lo=")
                 + "(.*)" + Pattern.quote("]") + ".*$");
 
+        @Override
+        public boolean isParsable(final String input) {
+            return EXTRACT_PLAYER_PATTERN.matcher(input).matches();
+        }
+
         /**
          * Pattern that checks if a string matches the following:
-         *   - starts with literal text '[Power] GameState.DebugPrintPower() -         tag='
-         *   - followed by zero or more characters, captured as the 1st group
+         *   - starts with literal text '[Power] GameState.DebugPrintPower() - '
+         *   - followed by four or more space characters, captured as the 1st group
+         *   - followed by literal text 'tag='
+         *   - followed by zero or more characters, captured as the 2nd group
          *   - followed by literal text ' value='
-         *   - ending with zero or more characters, captured as the 2nd group
+         *   - ending with zero or more characters, captured as the 3rd group
          */
         private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -         tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
+            Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - ") + "(\\s{4,})" + Pattern.quote("tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
 
         @Override
         public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
@@ -231,30 +263,37 @@ public class CreateGameEntryParser implements EntryParser {
             if (!playerMatcher.find()) {
                 throw new NotParsableException();
             }
-            String entityId = playerMatcher.group(1);
-            String playerId = playerMatcher.group(2);
-            String gameAccountIdHi = playerMatcher.group(3);
-            String gameAccountIdLo = playerMatcher.group(4);
+            int indentation = playerMatcher.group(1).length();
+            String entityId = playerMatcher.group(2);
+            String playerId = playerMatcher.group(3);
+            String gameAccountIdHi = playerMatcher.group(4);
+            String gameAccountIdLo = playerMatcher.group(5);
 
             GameAccountId gameAccountId = new GameAccountId.Builder()
                 .hi(gameAccountIdHi)
                 .lo(gameAccountIdLo)
                 .build();
 
+            builder.indentation(indentation);
             builder.entityId(entityId);
             builder.playerId(playerId);
             builder.gameAccountId(gameAccountId);
 
             Predicate<String> readCondition = line -> (LogLineUtils.isFromNamedLogger(line) &&
-                (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > 4));
+                (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation));
 
             while (lineReader.nextLineMatches(readCondition)) {
                 Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
                 if (!tagValueMatcher.find()) {
                     throw new NotParsableException();
                 }
-                String tag = tagValueMatcher.group(1);
-                String value = tagValueMatcher.group(2);
+                int tagValueIndentation = tagValueMatcher.group(1).length();
+                if (tagValueIndentation < indentation + 4) {
+                    //expect tag value pairs to be indented by 4 more than the parent player
+                    throw new NotParsableException();
+                }
+                String tag = tagValueMatcher.group(2);
+                String value = tagValueMatcher.group(3);
                 builder.addTagValuePair(tag, value);
             }
 

@@ -21,6 +21,24 @@ public class TransitioningEntryParserTest {
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new TransitioningEntryParser())))) {
             TransitioningLogEntry transitioningLogEntry = (TransitioningLogEntry)logReader.readNextEntry();
 
+            assertEquals(0, transitioningLogEntry.getIndentation());
+            assertEquals("Gul'dan", transitioningLogEntry.getName());
+            assertEquals("4", transitioningLogEntry.getId());
+            assertEquals("PLAY", transitioningLogEntry.getZone());
+            assertEquals("0", transitioningLogEntry.getZonePos());
+            assertEquals("HERO_07", transitioningLogEntry.getCardId());
+            assertEquals("1", transitioningLogEntry.getPlayer());
+            assertEquals("FRIENDLY PLAY (Hero)", transitioningLogEntry.getTargetZone());
+        }
+    }
+
+    @Test
+    public void testTransitioningIndented() throws Exception {
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Transitioning-indented.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new TransitioningEntryParser())))) {
+            TransitioningLogEntry transitioningLogEntry = (TransitioningLogEntry)logReader.readNextEntry();
+
+            assertEquals(4, transitioningLogEntry.getIndentation());
             assertEquals("Gul'dan", transitioningLogEntry.getName());
             assertEquals("4", transitioningLogEntry.getId());
             assertEquals("PLAY", transitioningLogEntry.getZone());

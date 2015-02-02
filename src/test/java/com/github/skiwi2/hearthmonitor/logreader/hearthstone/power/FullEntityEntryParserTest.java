@@ -21,6 +21,27 @@ public class FullEntityEntryParserTest {
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new FullEntityEntryParser())))) {
             FullEntityLogEntry fullEntityLogEntry = (FullEntityLogEntry)logReader.readNextEntry();
 
+            assertEquals(0, fullEntityLogEntry.getIndentation());
+            assertEquals("4", fullEntityLogEntry.getId());
+            assertEquals("HERO_07", fullEntityLogEntry.getCardId());
+
+            assertEquals("30", fullEntityLogEntry.getTagValue("HEALTH"));
+            assertEquals("PLAY", fullEntityLogEntry.getTagValue("ZONE"));
+            assertEquals("1", fullEntityLogEntry.getTagValue("CONTROLLER"));
+            assertEquals("4", fullEntityLogEntry.getTagValue("ENTITY_ID"));
+            assertEquals("NEUTRAL", fullEntityLogEntry.getTagValue("FACTION"));
+            assertEquals("HERO", fullEntityLogEntry.getTagValue("CARDTYPE"));
+            assertEquals("FREE", fullEntityLogEntry.getTagValue("RARITY"));
+        }
+    }
+
+    @Test
+    public void testFullEntityIndented() throws Exception {
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("FullEntity-indented.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new FullEntityEntryParser())))) {
+            FullEntityLogEntry fullEntityLogEntry = (FullEntityLogEntry)logReader.readNextEntry();
+
+            assertEquals(4, fullEntityLogEntry.getIndentation());
             assertEquals("4", fullEntityLogEntry.getId());
             assertEquals("HERO_07", fullEntityLogEntry.getCardId());
 

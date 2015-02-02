@@ -28,31 +28,35 @@ public class FullEntityEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() -     tag=RARITY value=FREE
      */
 
-    @Override
-    public boolean isParsable(final String input) {
-        return input.startsWith("[Power] GameState.DebugPrintPower() - FULL_ENTITY - Creating ID=");
-    }
-
     /**
      * Pattern that checks if a string matches the following:
-     *  - starts with literal text '[Power] GameState.DebugPrintPower() - FULL_ENTITY - Creating ID='
+     *  - starts with literal text '[Power] GameState.DebugPrintPower() - '
+     *  - followed by zero or more space characters, captured as the 1st group
+     *  - followed by literal text 'FULL_ENTITY - Creating ID=''
      *  - followed by zero or more characters, captured as the 1st group
      *  - followed by literal text ' CardID='
      *  - ending with zero or more characters, captured as the 2nd group
      */
     private static final Pattern EXTRACT_FULL_ENTITY_PATTERN =
-        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - FULL_ENTITY - Creating ID=") + "(.*)"
+        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - ") + "(\\s*)" + Pattern.quote("FULL_ENTITY - Creating ID=") + "(.*)"
             + Pattern.quote(" CardID=") + "(.*)$");
+
+    @Override
+    public boolean isParsable(final String input) {
+        return EXTRACT_FULL_ENTITY_PATTERN.matcher(input).matches();
+    }
 
     /**
      * Pattern that checks if a string matches the following:
-     *   - starts with literal text '[Power] GameState.DebugPrintPower() -     tag='
-     *   - followed by zero or more characters, captured as the 1st group
+     *   - starts with literal text '[Power] GameState.DebugPrintPower() - '
+     *   - followed by four or more space characters, captured as the 1st group
+     *   - followed by literal text 'tag='
+     *   - followed by zero or more characters, captured as the 2nd group
      *   - followed by literal text ' value='
-     *   - ending with zero or more characters, captured as the 2nd group
+     *   - ending with zero or more characters, captured as the 3rd group
      */
     private static final Pattern EXTRACT_TAG_VALUE_PATTERN =
-        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() -     tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
+        Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - ") + "(\\s{4,})" + Pattern.quote("tag=") + "(.*)" + Pattern.quote(" value=") + "(.*)$");
 
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
@@ -62,22 +66,29 @@ public class FullEntityEntryParser implements EntryParser {
         if (!fullEntityMatcher.find()) {
             throw new NotParsableException();
         }
-        String id = fullEntityMatcher.group(1);
-        String cardId = fullEntityMatcher.group(2);
+        int indentation = fullEntityMatcher.group(1).length();
+        String id = fullEntityMatcher.group(2);
+        String cardId = fullEntityMatcher.group(3);
 
+        builder.indentation(indentation);
         builder.id(id);
         builder.cardId(cardId);
 
         Predicate<String> readCondition = line -> (LogLineUtils.isFromNamedLogger(line) &&
-            (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > 0));
+            (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation));
 
         while (lineReader.nextLineMatches(readCondition)) {
             Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
             if (!tagValueMatcher.find()) {
                 throw new NotParsableException();
             }
-            String tag = tagValueMatcher.group(1);
-            String value = tagValueMatcher.group(2);
+            int tagValueIndentation = tagValueMatcher.group(1).length();
+            if (tagValueIndentation < indentation + 4) {
+                //expect tag value pairs to be indented by 4 more than the parent game entity
+                throw new NotParsableException();
+            }
+            String tag = tagValueMatcher.group(2);
+            String value = tagValueMatcher.group(3);
             builder.addTagValuePair(tag, value);
         }
 
