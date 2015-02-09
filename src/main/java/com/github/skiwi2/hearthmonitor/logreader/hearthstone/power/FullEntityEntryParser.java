@@ -45,9 +45,9 @@ public class FullEntityEntryParser implements EntryParser {
      *  - starts with literal text '[Power] GameState.DebugPrintPower() - '
      *  - followed by zero or more space characters, captured as the 1st group
      *  - followed by literal text 'FULL_ENTITY - Creating ID='
-     *  - followed by zero or more characters, captured as the 1st group
+     *  - followed by zero or more characters, captured as the 2nd group
      *  - followed by literal text ' CardID='
-     *  - ending with zero or more characters, captured as the 2nd group
+     *  - ending with zero or more characters, captured as the 3rd group
      */
     private static final Pattern EXTRACT_FULL_ENTITY_PATTERN =
         Pattern.compile("^" + Pattern.quote("[Power] GameState.DebugPrintPower() - ") + "(\\s*)" + Pattern.quote("FULL_ENTITY - Creating ID=") + "(.*)"
