@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 
 public class HideEntityEntryParserTest {
     @Test
-    public void testTagChange() throws Exception {
+    public void testHideEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("HideEntity.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(HideEntityEntryParser.createForIndentation(0))))) {
             HideEntityLogEntry hideEntityLogEntry = (HideEntityLogEntry)logReader.readNextEntry();
@@ -37,7 +37,7 @@ public class HideEntityEntryParserTest {
     }
 
     @Test
-    public void testTagChangeIndented() throws Exception {
+    public void testHideEntityIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("HideEntity-indented.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(HideEntityEntryParser.createForIndentation(4))))) {
             HideEntityLogEntry hideEntityLogEntry = (HideEntityLogEntry)logReader.readNextEntry();
@@ -56,7 +56,7 @@ public class HideEntityEntryParserTest {
     }
 
     @Test(expected = NotReadableException.class)
-    public void testTagChangeWrongIndentationLevel() throws Exception{
+    public void testHideEntityWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("HideEntity.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(HideEntityEntryParser.createForIndentation(4))))) {
             assertNotNull(logReader);
