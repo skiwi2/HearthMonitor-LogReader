@@ -1,0 +1,6 @@
+[Power] GameState.DebugPrintPower() -     SHOW_ENTITY - Updating Entity=[id=33 cardId= type=INVALID zone=DECK zonePos=0 player=1] CardID=CS2_062
+[Power] GameState.DebugPrintPower() -         tag=COST value=4
+[Power] GameState.DebugPrintPower() -         tag=ZONE value=HAND
+[Power] GameState.DebugPrintPower() -         tag=FACTION value=NEUTRAL
+[Power] GameState.DebugPrintPower() -         tag=CARDTYPE value=ABILITY
+[Power] GameState.DebugPrintPower() -         tag=RARITY value=FREE
