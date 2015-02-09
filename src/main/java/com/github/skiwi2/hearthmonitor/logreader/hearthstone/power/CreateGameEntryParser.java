@@ -101,7 +101,7 @@ public class CreateGameEntryParser implements EntryParser {
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader(
             lineReader.readNextLine(),
             lineReader,
-            line -> (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > 0),
+            line -> (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation),
             new HashSet<>(Arrays.asList(
                 (restrictIndentation) ? GameEntityEntryParser.createForIndentation(indentation + 4) : GameEntityEntryParser.create(),
                 (restrictIndentation) ? PlayerEntryParser.createForIndentation(indentation + 4) : PlayerEntryParser.create()
