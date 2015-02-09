@@ -44,7 +44,7 @@ public class FullEntityEntryParser implements EntryParser {
      * Pattern that checks if a string matches the following:
      *  - starts with literal text '[Power] GameState.DebugPrintPower() - '
      *  - followed by zero or more space characters, captured as the 1st group
-     *  - followed by literal text 'FULL_ENTITY - Creating ID=''
+     *  - followed by literal text 'FULL_ENTITY - Creating ID='
      *  - followed by zero or more characters, captured as the 1st group
      *  - followed by literal text ' CardID='
      *  - ending with zero or more characters, captured as the 2nd group
