@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class GameEntityEntryParserTest {
     @Test
     public void testGameEntity() throws Exception {
-        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGameGameEntity.log").toURI()), StandardCharsets.UTF_8);
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("GameEntity.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(GameEntityEntryParser.createForIndentation(4))))) {
             GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readNextEntry();
 
@@ -37,7 +37,7 @@ public class GameEntityEntryParserTest {
 
     @Test(expected = NotReadableException.class)
     public void testGameEntityWrongIndentationLevel() throws Exception{
-        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGameGameEntity.log").toURI()), StandardCharsets.UTF_8);
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("GameEntity.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(GameEntityEntryParser.createForIndentation(0))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
