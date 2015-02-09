@@ -1,5 +1,6 @@
 package com.github.skiwi2.hearthmonitor.logreader.hearthstone.zone;
 
+import com.github.skiwi2.hearthmonitor.logapi.power.CardEntityLogObject;
 import com.github.skiwi2.hearthmonitor.logapi.zone.TransitioningLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
@@ -21,14 +22,15 @@ public class TransitioningEntryParserTest {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Transitioning.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TransitioningEntryParser.createForIndentation(0))))) {
             TransitioningLogEntry transitioningLogEntry = (TransitioningLogEntry)logReader.readNextEntry();
+            CardEntityLogObject cardEntityLogObject = (CardEntityLogObject)transitioningLogEntry.getEntity();
 
             assertEquals(0, transitioningLogEntry.getIndentation());
-            assertEquals("Gul'dan", transitioningLogEntry.getName());
-            assertEquals("4", transitioningLogEntry.getId());
-            assertEquals("PLAY", transitioningLogEntry.getZone());
-            assertEquals("0", transitioningLogEntry.getZonePos());
-            assertEquals("HERO_07", transitioningLogEntry.getCardId());
-            assertEquals("1", transitioningLogEntry.getPlayer());
+            assertEquals("Gul'dan", cardEntityLogObject.getName());
+            assertEquals("4", cardEntityLogObject.getId());
+            assertEquals("PLAY", cardEntityLogObject.getZone());
+            assertEquals("0", cardEntityLogObject.getZonePos());
+            assertEquals("HERO_07", cardEntityLogObject.getCardId());
+            assertEquals("1", cardEntityLogObject.getPlayer());
             assertEquals("FRIENDLY PLAY (Hero)", transitioningLogEntry.getTargetZone());
         }
     }
@@ -38,14 +40,15 @@ public class TransitioningEntryParserTest {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Transitioning-indented.log").toURI()), StandardCharsets.UTF_8);
         try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TransitioningEntryParser.createForIndentation(4))))) {
             TransitioningLogEntry transitioningLogEntry = (TransitioningLogEntry)logReader.readNextEntry();
+            CardEntityLogObject cardEntityLogObject = (CardEntityLogObject)transitioningLogEntry.getEntity();
 
             assertEquals(4, transitioningLogEntry.getIndentation());
-            assertEquals("Gul'dan", transitioningLogEntry.getName());
-            assertEquals("4", transitioningLogEntry.getId());
-            assertEquals("PLAY", transitioningLogEntry.getZone());
-            assertEquals("0", transitioningLogEntry.getZonePos());
-            assertEquals("HERO_07", transitioningLogEntry.getCardId());
-            assertEquals("1", transitioningLogEntry.getPlayer());
+            assertEquals("Gul'dan", cardEntityLogObject.getName());
+            assertEquals("4", cardEntityLogObject.getId());
+            assertEquals("PLAY", cardEntityLogObject.getZone());
+            assertEquals("0", cardEntityLogObject.getZonePos());
+            assertEquals("HERO_07", cardEntityLogObject.getCardId());
+            assertEquals("1", cardEntityLogObject.getPlayer());
             assertEquals("FRIENDLY PLAY (Hero)", transitioningLogEntry.getTargetZone());
         }
     }

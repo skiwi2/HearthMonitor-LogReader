@@ -1,6 +1,7 @@
 package com.github.skiwi2.hearthmonitor.logreader.hearthstone.power;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
+import com.github.skiwi2.hearthmonitor.logapi.power.EntityLogObject;
 import com.github.skiwi2.hearthmonitor.logapi.power.TagChangeLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 import com.github.skiwi2.hearthmonitor.logreader.LineReader;
@@ -69,8 +70,14 @@ public class TagChangeEntryParser implements EntryParser {
         String tag = tagChangeMatcher.group(3);
         String value = tagChangeMatcher.group(4);
 
+        EntityObjectParser entityObjectParser = new EntityObjectParser();
+        if (!entityObjectParser.isParsable(entity)) {
+            throw new NotParsableException();
+        }
+        EntityLogObject entityLogObject = (EntityLogObject)entityObjectParser.parse(entity);
+
         builder.indentation(localIndentation);
-        builder.entity(entity);
+        builder.entity(entityLogObject);
         builder.tag(tag);
         builder.value(value);
 

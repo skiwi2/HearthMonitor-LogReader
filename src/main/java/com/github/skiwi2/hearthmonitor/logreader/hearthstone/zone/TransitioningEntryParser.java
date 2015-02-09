@@ -1,11 +1,13 @@
 package com.github.skiwi2.hearthmonitor.logreader.hearthstone.zone;
 
 import com.github.skiwi2.hearthmonitor.logapi.LogEntry;
+import com.github.skiwi2.hearthmonitor.logapi.power.EntityLogObject;
 import com.github.skiwi2.hearthmonitor.logapi.zone.TransitioningLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 import com.github.skiwi2.hearthmonitor.logreader.LineReader;
 import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.LogLineUtils;
+import com.github.skiwi2.hearthmonitor.logreader.hearthstone.power.EntityObjectParser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,25 +39,13 @@ public class TransitioningEntryParser implements EntryParser {
      * Pattern that checks if a string matches the following:
      *  - starts with literal text '[Zone] ZoneChangeList.ProcessChanges() - '
      *  - followed by zero or more space characters, captured as the 1st group
-     *  - followed by literal text 'TRANSITIONING card [name='
+     *  - followed by literal text 'TRANSITIONING card '
      *  - followed by zero or more characters, captured as the 2nd group
-     *  - followed by literal text ' id='
-     *  - followed by zero or more characters, captured as the 3rd group
-     *  - followed by literal text ' zone='
-     *  - followed by zero or more characters, captured as the 4th group
-     *  - followed by literal text ' zonePos='
-     *  - followed by zero or more characters, captured as the 5th group
-     *  - followed by literal text ' cardId='
-     *  - followed by zero or more characters, captured as the 6th group
-     *  - followed by literal text ' player='
-     *  - followed by zero or more characters, captured as the 7th group
-     *  - followed by literal text '] to '
-     *  - ending with zero or more characters, captured as the 8th group
+     *  - followed by literal text ' to '
+     *  - ending with zero or more characters, captured as the 3rd group
      */
     private static final Pattern EXTRACT_TRANSITIONING_PATTERN =
-        Pattern.compile("^" + Pattern.quote("[Zone] ZoneChangeList.ProcessChanges() - ") + "(\\s*)" + Pattern.quote("TRANSITIONING card [name=") + "(.*)"
-            + Pattern.quote(" id=") + "(.*)" + Pattern.quote(" zone=") + "(.*)" + Pattern.quote(" zonePos=") + "(.*)"
-            + Pattern.quote(" cardId=") + "(.*)" + Pattern.quote(" player=") + "(.*)" + Pattern.quote("] to ") + "(.*)$");
+        Pattern.compile("^" + Pattern.quote("[Zone] ZoneChangeList.ProcessChanges() - ") + "(\\s*)" + Pattern.quote("TRANSITIONING card ") + "(.*)" + Pattern.quote(" to ") + "(.*)$");
 
     @Override
     public boolean isParsable(final String input) {
@@ -75,21 +65,17 @@ public class TransitioningEntryParser implements EntryParser {
             throw new NotParsableException();
         }
         int localIndentation = transitioningMatcher.group(1).length();
-        String name = transitioningMatcher.group(2);
-        String id = transitioningMatcher.group(3);
-        String zone = transitioningMatcher.group(4);
-        String zonePos = transitioningMatcher.group(5);
-        String cardId = transitioningMatcher.group(6);
-        String player = transitioningMatcher.group(7);
-        String targetZone = transitioningMatcher.group(8);
+        String entity = transitioningMatcher.group(2);
+        String targetZone = transitioningMatcher.group(3);
+
+        EntityObjectParser entityObjectParser = new EntityObjectParser();
+        if (!entityObjectParser.isParsable(entity)) {
+            throw new NotParsableException();
+        }
+        EntityLogObject entityLogObject = (EntityLogObject)entityObjectParser.parse(entity);
 
         builder.indentation(localIndentation);
-        builder.name(name);
-        builder.id(id);
-        builder.zone(zone);
-        builder.zonePos(zonePos);
-        builder.cardId(cardId);
-        builder.player(player);
+        builder.entity(entityLogObject);
         builder.targetZone(targetZone);
 
         return builder.build();

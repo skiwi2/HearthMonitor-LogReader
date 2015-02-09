@@ -1,5 +1,6 @@
 package com.github.skiwi2.hearthmonitor.logreader.hearthstone.power;
 
+import com.github.skiwi2.hearthmonitor.logapi.power.PlayerEntityLogObject;
 import com.github.skiwi2.hearthmonitor.logapi.power.TagChangeLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
 import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
@@ -23,7 +24,7 @@ public class TagChangeEntryParserTest {
             TagChangeLogEntry tagChangeLogEntry = (TagChangeLogEntry)logReader.readNextEntry();
 
             assertEquals(0, tagChangeLogEntry.getIndentation());
-            assertEquals("skiwi", tagChangeLogEntry.getEntity());
+            assertEquals("skiwi", ((PlayerEntityLogObject)tagChangeLogEntry.getEntity()).getName());
             assertEquals("TIMEOUT", tagChangeLogEntry.getTag());
             assertEquals("75", tagChangeLogEntry.getValue());
         }
@@ -36,7 +37,7 @@ public class TagChangeEntryParserTest {
             TagChangeLogEntry tagChangeLogEntry = (TagChangeLogEntry)logReader.readNextEntry();
 
             assertEquals(4, tagChangeLogEntry.getIndentation());
-            assertEquals("skiwi", tagChangeLogEntry.getEntity());
+            assertEquals("skiwi", ((PlayerEntityLogObject)tagChangeLogEntry.getEntity()).getName());
             assertEquals("TIMEOUT", tagChangeLogEntry.getTag());
             assertEquals("75", tagChangeLogEntry.getValue());
         }
