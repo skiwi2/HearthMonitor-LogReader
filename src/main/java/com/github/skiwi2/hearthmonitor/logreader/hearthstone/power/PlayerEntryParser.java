@@ -37,6 +37,18 @@ public class PlayerEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() -         tag=NUM_TURNS_LEFT value=1
      */
 
+    private boolean restrictIndentation;
+    private final int indentation;
+
+    private PlayerEntryParser() {
+        this.indentation = 0;
+    }
+
+    private PlayerEntryParser(final int indentation) {
+        this.restrictIndentation = true;
+        this.indentation = indentation;
+    }
+
     /**
      * Pattern that checks if a string matches the following:
      *   - starts with literal text '[Power] GameState.DebugPrintPower() - '
@@ -59,7 +71,7 @@ public class PlayerEntryParser implements EntryParser {
 
     @Override
     public boolean isParsable(final String input) {
-        return EXTRACT_PLAYER_PATTERN.matcher(input).matches();
+        return (EXTRACT_PLAYER_PATTERN.matcher(input).matches() && isValidIndentation(input));
     }
 
     /**
@@ -76,13 +88,17 @@ public class PlayerEntryParser implements EntryParser {
 
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
+        if (!isValidIndentation(input)) {
+            throw new NotParsableException();
+        }
+
         PlayerLogEntry.Builder builder = new PlayerLogEntry.Builder();
 
         Matcher playerMatcher = EXTRACT_PLAYER_PATTERN.matcher(input);
         if (!playerMatcher.find()) {
             throw new NotParsableException();
         }
-        int indentation = playerMatcher.group(1).length();
+        int localIndentation = playerMatcher.group(1).length();
         String entityId = playerMatcher.group(2);
         String playerId = playerMatcher.group(3);
         String gameAccountIdHi = playerMatcher.group(4);
@@ -93,13 +109,13 @@ public class PlayerEntryParser implements EntryParser {
             .lo(gameAccountIdLo)
             .build();
 
-        builder.indentation(indentation);
+        builder.indentation(localIndentation);
         builder.entityId(entityId);
         builder.playerId(playerId);
         builder.gameAccountId(gameAccountId);
 
         Predicate<String> readCondition = line -> (LogLineUtils.isFromNamedLogger(line) &&
-            (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation));
+            (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > localIndentation));
 
         while (lineReader.nextLineMatches(readCondition)) {
             Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
@@ -107,7 +123,7 @@ public class PlayerEntryParser implements EntryParser {
                 throw new NotParsableException();
             }
             int tagValueIndentation = tagValueMatcher.group(1).length();
-            if (tagValueIndentation < indentation + 4) {
+            if (tagValueIndentation < localIndentation + 4) {
                 //expect tag value pairs to be indented by 4 more than the parent player
                 throw new NotParsableException();
             }
@@ -117,5 +133,17 @@ public class PlayerEntryParser implements EntryParser {
         }
 
         return builder.build();
+    }
+
+    private boolean isValidIndentation(final String input) {
+        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+    }
+
+    public static PlayerEntryParser create() {
+        return new PlayerEntryParser();
+    }
+
+    public static PlayerEntryParser createForIndentation(final int indentation) {
+        return new PlayerEntryParser(indentation);
     }
 }

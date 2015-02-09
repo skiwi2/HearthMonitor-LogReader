@@ -2,6 +2,7 @@ package com.github.skiwi2.hearthmonitor.logreader.hearthstone.power;
 
 import com.github.skiwi2.hearthmonitor.logapi.power.FullEntityLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
 import com.github.skiwi2.hearthmonitor.logreader.logreaders.FileLogReader;
 import org.junit.Test;
 
@@ -12,13 +13,13 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class FullEntityEntryParserTest {
     @Test
     public void testFullEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("FullEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new FullEntityEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createForIndentation(0))))) {
             FullEntityLogEntry fullEntityLogEntry = (FullEntityLogEntry)logReader.readNextEntry();
 
             assertEquals(0, fullEntityLogEntry.getIndentation());
@@ -38,7 +39,7 @@ public class FullEntityEntryParserTest {
     @Test
     public void testFullEntityIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("FullEntity-indented.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new FullEntityEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createForIndentation(4))))) {
             FullEntityLogEntry fullEntityLogEntry = (FullEntityLogEntry)logReader.readNextEntry();
 
             assertEquals(4, fullEntityLogEntry.getIndentation());
@@ -52,6 +53,15 @@ public class FullEntityEntryParserTest {
             assertEquals("NEUTRAL", fullEntityLogEntry.getTagValue("FACTION"));
             assertEquals("HERO", fullEntityLogEntry.getTagValue("CARDTYPE"));
             assertEquals("FREE", fullEntityLogEntry.getTagValue("RARITY"));
+        }
+    }
+
+    @Test(expected = NotReadableException.class)
+    public void testFullEntityWrongIndentationLevel() throws Exception{
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("FullEntity.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createForIndentation(4))))) {
+            assertNotNull(logReader);
+            logReader.readNextEntry();
         }
     }
 }

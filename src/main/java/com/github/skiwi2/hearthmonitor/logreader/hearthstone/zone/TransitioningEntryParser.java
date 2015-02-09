@@ -5,6 +5,7 @@ import com.github.skiwi2.hearthmonitor.logapi.zone.TransitioningLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.EntryParser;
 import com.github.skiwi2.hearthmonitor.logreader.LineReader;
 import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
+import com.github.skiwi2.hearthmonitor.logreader.hearthstone.LogLineUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +19,19 @@ public class TransitioningEntryParser implements EntryParser {
     /*
      * [Zone] ZoneChangeList.ProcessChanges() - TRANSITIONING card [name=Gul'dan id=4 zone=PLAY zonePos=0 cardId=HERO_07 player=1] to FRIENDLY PLAY (Hero)
      */
+
+    private boolean restrictIndentation;
+    private final int indentation;
+
+    private TransitioningEntryParser() {
+        this.indentation = 0;
+    }
+
+    private TransitioningEntryParser(final int indentation) {
+        this.restrictIndentation = true;
+        this.indentation = indentation;
+    }
+
 
     /**
      * Pattern that checks if a string matches the following:
@@ -45,18 +59,22 @@ public class TransitioningEntryParser implements EntryParser {
 
     @Override
     public boolean isParsable(final String input) {
-        return EXTRACT_TRANSITIONING_PATTERN.matcher(input).matches();
+        return (EXTRACT_TRANSITIONING_PATTERN.matcher(input).matches() && isValidIndentation(input));
     }
 
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
+        if (!isValidIndentation(input)) {
+            throw new NotParsableException();
+        }
+
         TransitioningLogEntry.Builder builder = new TransitioningLogEntry.Builder();
 
         Matcher transitioningMatcher = EXTRACT_TRANSITIONING_PATTERN.matcher(input);
         if (!transitioningMatcher.find()) {
             throw new NotParsableException();
         }
-        int indentation = transitioningMatcher.group(1).length();
+        int localIndentation = transitioningMatcher.group(1).length();
         String name = transitioningMatcher.group(2);
         String id = transitioningMatcher.group(3);
         String zone = transitioningMatcher.group(4);
@@ -65,7 +83,7 @@ public class TransitioningEntryParser implements EntryParser {
         String player = transitioningMatcher.group(7);
         String targetZone = transitioningMatcher.group(8);
 
-        builder.indentation(indentation);
+        builder.indentation(localIndentation);
         builder.name(name);
         builder.id(id);
         builder.zone(zone);
@@ -75,5 +93,17 @@ public class TransitioningEntryParser implements EntryParser {
         builder.targetZone(targetZone);
 
         return builder.build();
+    }
+
+    private boolean isValidIndentation(final String input) {
+        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+    }
+
+    public static TransitioningEntryParser create() {
+        return new TransitioningEntryParser();
+    }
+
+    public static TransitioningEntryParser createForIndentation(final int indentation) {
+        return new TransitioningEntryParser(indentation);
     }
 }

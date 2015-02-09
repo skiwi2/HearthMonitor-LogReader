@@ -4,6 +4,7 @@ import com.github.skiwi2.hearthmonitor.logapi.power.CreateGameLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.GameEntityLogEntry;
 import com.github.skiwi2.hearthmonitor.logapi.power.PlayerLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
 import com.github.skiwi2.hearthmonitor.logreader.logreaders.FileLogReader;
 import org.junit.Test;
 
@@ -16,12 +17,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class CreateGameEntryParserTest {
     @Test
     public void testCreateGame() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createForIndentation(0))))) {
             CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readNextEntry();
 
             assertEquals(0, createGameLogEntry.getIndentation());
@@ -89,7 +91,7 @@ public class CreateGameEntryParserTest {
     @Test
     public void testCreateGameIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame-indented.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createForIndentation(4))))) {
             CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readNextEntry();
 
             assertEquals(4, createGameLogEntry.getIndentation());
@@ -157,9 +159,18 @@ public class CreateGameEntryParserTest {
     @Test
     public void testCreateGameTwice() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame-twice.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new CreateGameEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createForIndentation(0))))) {
             assertEquals(CreateGameLogEntry.class, logReader.readNextEntry().getClass());
             assertEquals(CreateGameLogEntry.class, logReader.readNextEntry().getClass());
+        }
+    }
+
+    @Test(expected = NotReadableException.class)
+    public void testCreateGameWrongIndentationLevel() throws Exception{
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createForIndentation(4))))) {
+            assertNotNull(logReader);
+            logReader.readNextEntry();
         }
     }
 

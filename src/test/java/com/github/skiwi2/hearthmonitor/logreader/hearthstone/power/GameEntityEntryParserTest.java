@@ -2,6 +2,7 @@ package com.github.skiwi2.hearthmonitor.logreader.hearthstone.power;
 
 import com.github.skiwi2.hearthmonitor.logapi.power.GameEntityLogEntry;
 import com.github.skiwi2.hearthmonitor.logreader.CloseableLogReader;
+import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
 import com.github.skiwi2.hearthmonitor.logreader.logreaders.FileLogReader;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class GameEntityEntryParserTest {
     @Test
     public void testGameEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGameGameEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(new GameEntityEntryParser())))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(GameEntityEntryParser.createForIndentation(4))))) {
             GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readNextEntry();
 
             assertEquals(4, gameEntityLogEntry.getIndentation());
@@ -31,6 +32,15 @@ public class GameEntityEntryParserTest {
             assertEquals("BEGIN_MULLIGAN", gameEntityLogEntry.getTagValue("NEXT_STEP"));
             assertEquals("GAME", gameEntityLogEntry.getTagValue("CARDTYPE"));
             assertEquals("RUNNING", gameEntityLogEntry.getTagValue("STATE"));
+        }
+    }
+
+    @Test(expected = NotReadableException.class)
+    public void testGameEntityWrongIndentationLevel() throws Exception{
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGameGameEntity.log").toURI()), StandardCharsets.UTF_8);
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(GameEntityEntryParser.createForIndentation(0))))) {
+            assertNotNull(logReader);
+            logReader.readNextEntry();
         }
     }
 }

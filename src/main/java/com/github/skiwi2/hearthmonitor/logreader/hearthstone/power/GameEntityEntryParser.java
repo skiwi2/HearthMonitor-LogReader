@@ -28,6 +28,18 @@ public class GameEntityEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() -         tag=STATE value=RUNNING
      */
 
+    private boolean restrictIndentation;
+    private final int indentation;
+
+    private GameEntityEntryParser() {
+        this.indentation = 0;
+    }
+
+    private GameEntityEntryParser(final int indentation) {
+        this.restrictIndentation = true;
+        this.indentation = indentation;
+    }
+
     /**
      * Pattern that checks if a string matches the following:
      *   - starts with literal text '[Power] GameState.DebugPrintPower() - '
@@ -40,7 +52,7 @@ public class GameEntityEntryParser implements EntryParser {
 
     @Override
     public boolean isParsable(final String input) {
-        return EXTRACT_GAME_ENTITY_PATTERN.matcher(input).matches();
+        return (EXTRACT_GAME_ENTITY_PATTERN.matcher(input).matches() && isValidIndentation(input));
     }
 
     /**
@@ -57,19 +69,23 @@ public class GameEntityEntryParser implements EntryParser {
 
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
+        if (!isValidIndentation(input)) {
+            throw new NotParsableException();
+        }
+
         GameEntityLogEntry.Builder builder = new GameEntityLogEntry.Builder();
 
         Matcher gameEntityMatcher = EXTRACT_GAME_ENTITY_PATTERN.matcher(input);
         if (!gameEntityMatcher.find()) {
             throw new NotParsableException();
         }
-        int indentation = gameEntityMatcher.group(1).length();
+        int localIndentation = gameEntityMatcher.group(1).length();
         String entityId = gameEntityMatcher.group(2);
-        builder.indentation(indentation);
+        builder.indentation(localIndentation);
         builder.entityId(entityId);
 
         Predicate<String> readCondition = line -> (LogLineUtils.isFromNamedLogger(line) &&
-            (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation));
+            (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > localIndentation));
 
         while (lineReader.nextLineMatches(readCondition)) {
             Matcher tagValueMatcher = EXTRACT_TAG_VALUE_PATTERN.matcher(lineReader.readNextLine());
@@ -77,7 +93,7 @@ public class GameEntityEntryParser implements EntryParser {
                 throw new NotParsableException();
             }
             int tagValueIndentation = tagValueMatcher.group(1).length();
-            if (tagValueIndentation < indentation + 4) {
+            if (tagValueIndentation < localIndentation + 4) {
                 //expect tag value pairs to be indented by 4 more than the parent game entity
                 throw new NotParsableException();
             }
@@ -87,5 +103,17 @@ public class GameEntityEntryParser implements EntryParser {
         }
 
         return builder.build();
+    }
+
+    private boolean isValidIndentation(final String input) {
+        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+    }
+
+    public static GameEntityEntryParser create() {
+        return new GameEntityEntryParser();
+    }
+
+    public static GameEntityEntryParser createForIndentation(final int indentation) {
+        return new GameEntityEntryParser(indentation);
     }
 }
