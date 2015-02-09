@@ -1,0 +1,25 @@
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=skiwi SubType=TRIGGER Index=-1 Target=0
+[Power] GameState.DebugPrintPower() -         SHOW_ENTITY - Updating Entity=[id=33 cardId= type=INVALID zone=DECK zonePos=0 player=1] CardID=CS2_062
+[Power] GameState.DebugPrintPower() -             tag=COST value=4
+[Power] GameState.DebugPrintPower() -             tag=ZONE value=HAND
+[Power] GameState.DebugPrintPower() -             tag=FACTION value=NEUTRAL
+[Power] GameState.DebugPrintPower() -             tag=CARDTYPE value=ABILITY
+[Power] GameState.DebugPrintPower() -             tag=RARITY value=FREE
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[id=33 cardId= type=INVALID zone=DECK zonePos=0 player=1] tag=ZONE_POSITION value=2
+[Power] GameState.DebugPrintPower() -         HIDE_ENTITY - Entity=[name=Dark Iron Dwarf id=27 zone=HAND zonePos=2 cardId=EX1_046 player=1] tag=ZONE value=DECK
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Dark Iron Dwarf id=27 zone=HAND zonePos=2 cardId=EX1_046 player=1] tag=ZONE value=DECK
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Dark Iron Dwarf id=27 zone=HAND zonePos=2 cardId=EX1_046 player=1] tag=ZONE_POSITION value=0
+[Power] GameState.DebugPrintPower() -         SHOW_ENTITY - Updating Entity=[id=14 cardId= type=INVALID zone=DECK zonePos=0 player=1] CardID=GVG_096
+[Power] GameState.DebugPrintPower() -             tag=HEALTH value=3
+[Power] GameState.DebugPrintPower() -             tag=ATK value=4
+[Power] GameState.DebugPrintPower() -             tag=COST value=4
+[Power] GameState.DebugPrintPower() -             tag=ZONE value=HAND
+[Power] GameState.DebugPrintPower() -             tag=CARDTYPE value=MINION
+[Power] GameState.DebugPrintPower() -             tag=RARITY value=COMMON
+[Power] GameState.DebugPrintPower() -             tag=DEATHRATTLE value=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[id=14 cardId= type=INVALID zone=DECK zonePos=0 player=1] tag=ZONE_POSITION value=3
+[Power] GameState.DebugPrintPower() -         HIDE_ENTITY - Entity=[name=Dread Infernal id=34 zone=HAND zonePos=3 cardId=CS2_064 player=1] tag=ZONE value=DECK
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Dread Infernal id=34 zone=HAND zonePos=3 cardId=CS2_064 player=1] tag=ZONE value=DECK
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Dread Infernal id=34 zone=HAND zonePos=3 cardId=CS2_064 player=1] tag=ZONE_POSITION value=0
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=skiwi tag=MULLIGAN_STATE value=WAITING
+[Power] GameState.DebugPrintPower() -     ACTION_END
