@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Used to parse [Power] FULL_ENTITY entries.
+ * Used to parse [Power] SHOW_ENTITY entries.
  *
  * @author Frank van Heeswijk
  */

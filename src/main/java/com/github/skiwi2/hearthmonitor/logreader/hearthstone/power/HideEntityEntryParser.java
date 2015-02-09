@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Used to parse [Power] TAG_CHANGE entries.
+ * Used to parse [Power] HIDE_ENTITY entries.
  *
  * @author Frank van Heeswijk
  */
