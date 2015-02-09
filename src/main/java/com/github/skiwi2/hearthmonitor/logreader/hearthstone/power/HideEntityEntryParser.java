@@ -61,14 +61,14 @@ public class HideEntityEntryParser implements EntryParser {
 
         HideEntityLogEntry.Builder builder = new HideEntityLogEntry.Builder();
 
-        Matcher tagChangeMatcher = EXTRACT_HIDE_ENTITY_PATTERN.matcher(input);
-        if (!tagChangeMatcher.find()) {
+        Matcher hideEntityEntryMatcher = EXTRACT_HIDE_ENTITY_PATTERN.matcher(input);
+        if (!hideEntityEntryMatcher.find()) {
             throw new NotParsableException();
         }
-        int localIndentation = tagChangeMatcher.group(1).length();
-        String entity = tagChangeMatcher.group(2);
-        String tag = tagChangeMatcher.group(3);
-        String value = tagChangeMatcher.group(4);
+        int localIndentation = hideEntityEntryMatcher.group(1).length();
+        String entity = hideEntityEntryMatcher.group(2);
+        String tag = hideEntityEntryMatcher.group(3);
+        String value = hideEntityEntryMatcher.group(4);
 
         EntityObjectParser entityObjectParser = new EntityObjectParser();
         if (!entityObjectParser.isParsable(entity)) {
