@@ -19,7 +19,7 @@ public class FullEntityEntryParserTest {
     @Test
     public void testFullEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("FullEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createForIndentation(0))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createParser(0))))) {
             FullEntityLogEntry fullEntityLogEntry = (FullEntityLogEntry)logReader.readNextEntry();
 
             assertEquals(0, fullEntityLogEntry.getIndentation());
@@ -39,7 +39,7 @@ public class FullEntityEntryParserTest {
     @Test
     public void testFullEntityIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("FullEntity-indented.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createParser(4))))) {
             FullEntityLogEntry fullEntityLogEntry = (FullEntityLogEntry)logReader.readNextEntry();
 
             assertEquals(4, fullEntityLogEntry.getIndentation());
@@ -59,7 +59,7 @@ public class FullEntityEntryParserTest {
     @Test(expected = NotReadableException.class)
     public void testFullEntityWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("FullEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(FullEntityEntryParser.createParser(4))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
         }

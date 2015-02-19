@@ -19,7 +19,7 @@ public class GameEntityEntryParserTest {
     @Test
     public void testGameEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("GameEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(GameEntityEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(GameEntityEntryParser.createParser(4))))) {
             GameEntityLogEntry gameEntityLogEntry = (GameEntityLogEntry)logReader.readNextEntry();
 
             assertEquals(4, gameEntityLogEntry.getIndentation());
@@ -38,7 +38,7 @@ public class GameEntityEntryParserTest {
     @Test(expected = NotReadableException.class)
     public void testGameEntityWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("GameEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(GameEntityEntryParser.createForIndentation(0))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(GameEntityEntryParser.createParser(0))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
         }

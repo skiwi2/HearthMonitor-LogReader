@@ -20,7 +20,7 @@ public class TagChangeEntryParserTest {
     @Test
     public void testTagChange() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("TagChange.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TagChangeEntryParser.createForIndentation(0))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TagChangeEntryParser.createParser(0))))) {
             TagChangeLogEntry tagChangeLogEntry = (TagChangeLogEntry)logReader.readNextEntry();
 
             assertEquals(0, tagChangeLogEntry.getIndentation());
@@ -33,7 +33,7 @@ public class TagChangeEntryParserTest {
     @Test
     public void testTagChangeIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("TagChange-indented.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TagChangeEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TagChangeEntryParser.createParser(4))))) {
             TagChangeLogEntry tagChangeLogEntry = (TagChangeLogEntry)logReader.readNextEntry();
 
             assertEquals(4, tagChangeLogEntry.getIndentation());
@@ -46,7 +46,7 @@ public class TagChangeEntryParserTest {
     @Test(expected = NotReadableException.class)
     public void testTagChangeWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("TagChange.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TagChangeEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TagChangeEntryParser.createParser(4))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
         }

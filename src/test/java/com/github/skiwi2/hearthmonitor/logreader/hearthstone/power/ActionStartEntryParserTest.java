@@ -24,16 +24,16 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 
 public class ActionStartEntryParserTest {
-    private static final Set<EntryParser> INNER_ENTRY_PARSERS = new HashSet<>(Arrays.asList(
-        ShowEntityEntryParser.create(),
-        TagChangeEntryParser.create(),
-        HideEntityEntryParser.create()
+    private static final Set<EntryParser.Factory<? extends EntryParser>> INNER_ENTRY_PARSER_FACTORIES = new HashSet<>(Arrays.asList(
+        ShowEntityEntryParser.createFactory(),
+        TagChangeEntryParser.createFactory(),
+        HideEntityEntryParser.createFactory()
     ));
 
     @Test
     public void testActionStart() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("ActionStart.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ActionStartEntryParser.createForIndentation(0, INNER_ENTRY_PARSERS))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ActionStartEntryParser.createParser(0, INNER_ENTRY_PARSER_FACTORIES))))) {
             ActionStartLogEntry actionStartLogEntry = (ActionStartLogEntry)logReader.readNextEntry();
 
             assertEquals(0, actionStartLogEntry.getIndentation());
@@ -77,7 +77,7 @@ public class ActionStartEntryParserTest {
     @Test
     public void testActionStartIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("ActionStart-indented.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ActionStartEntryParser.createForIndentation(4, INNER_ENTRY_PARSERS))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ActionStartEntryParser.createParser(4, INNER_ENTRY_PARSER_FACTORIES))))) {
             ActionStartLogEntry actionStartLogEntry = (ActionStartLogEntry)logReader.readNextEntry();
 
             assertEquals(4, actionStartLogEntry.getIndentation());
@@ -121,7 +121,7 @@ public class ActionStartEntryParserTest {
     @Test
     public void testActionStartTwice() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("ActionStart-twice.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ActionStartEntryParser.createForIndentation(0, INNER_ENTRY_PARSERS))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ActionStartEntryParser.createParser(0, INNER_ENTRY_PARSER_FACTORIES))))) {
             assertEquals(ActionStartLogEntry.class, logReader.readNextEntry().getClass());
             try {
                 logReader.readNextEntry();
@@ -136,7 +136,7 @@ public class ActionStartEntryParserTest {
     @Test(expected = NotReadableException.class)
     public void testActionStartWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("ActionStart.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ActionStartEntryParser.createForIndentation(4, INNER_ENTRY_PARSERS))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ActionStartEntryParser.createParser(4, INNER_ENTRY_PARSER_FACTORIES))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
         }

@@ -20,7 +20,7 @@ public class ShowEntityEntryParserTest {
     @Test
     public void testShowEntity() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("ShowEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ShowEntityEntryParser.createForIndentation(0))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ShowEntityEntryParser.createParser(0))))) {
             ShowEntityLogEntry showEntityLogEntry = (ShowEntityLogEntry)logReader.readNextEntry();
             CardEntityLogObject cardEntityLogObject = (CardEntityLogObject)showEntityLogEntry.getEntity();
 
@@ -44,7 +44,7 @@ public class ShowEntityEntryParserTest {
     @Test
     public void testShowEntityIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("ShowEntity-indented.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ShowEntityEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ShowEntityEntryParser.createParser(4))))) {
             ShowEntityLogEntry showEntityLogEntry = (ShowEntityLogEntry)logReader.readNextEntry();
             CardEntityLogObject cardEntityLogObject = (CardEntityLogObject)showEntityLogEntry.getEntity();
 
@@ -68,7 +68,7 @@ public class ShowEntityEntryParserTest {
     @Test(expected = NotReadableException.class)
     public void testShowEntityWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("ShowEntity.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ShowEntityEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(ShowEntityEntryParser.createParser(4))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
         }

@@ -21,15 +21,9 @@ public class HideEntityEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() -     HIDE_ENTITY - Entity=[name=Dread Infernal id=34 zone=HAND zonePos=3 cardId=CS2_064 player=1] tag=ZONE value=DECK
      */
 
-    private boolean restrictIndentation;
     private final int indentation;
 
-    private HideEntityEntryParser() {
-        this.indentation = 0;
-    }
-
     private HideEntityEntryParser(final int indentation) {
-        this.restrictIndentation = true;
         this.indentation = indentation;
     }
 
@@ -85,14 +79,21 @@ public class HideEntityEntryParser implements EntryParser {
     }
 
     private boolean isValidIndentation(final String input) {
-        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+        return (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
     }
 
-    public static HideEntityEntryParser create() {
-        return new HideEntityEntryParser();
+    public static EntryParser.Factory<HideEntityEntryParser> createFactory() {
+        return new Factory();
     }
 
-    public static HideEntityEntryParser createForIndentation(final int indentation) {
-        return new HideEntityEntryParser(indentation);
+    public static HideEntityEntryParser createParser(final int indentation) {
+        return createFactory().create(indentation);
+    }
+
+    public static class Factory implements EntryParser.Factory<HideEntityEntryParser> {
+        @Override
+        public HideEntityEntryParser create(final int indentation) {
+            return new HideEntityEntryParser(indentation);
+        }
     }
 }

@@ -22,15 +22,9 @@ public class TransitioningEntryParser implements EntryParser {
      * [Zone] ZoneChangeList.ProcessChanges() - TRANSITIONING card [name=Gul'dan id=4 zone=PLAY zonePos=0 cardId=HERO_07 player=1] to FRIENDLY PLAY (Hero)
      */
 
-    private boolean restrictIndentation;
     private final int indentation;
 
-    private TransitioningEntryParser() {
-        this.indentation = 0;
-    }
-
     private TransitioningEntryParser(final int indentation) {
-        this.restrictIndentation = true;
         this.indentation = indentation;
     }
 
@@ -82,14 +76,21 @@ public class TransitioningEntryParser implements EntryParser {
     }
 
     private boolean isValidIndentation(final String input) {
-        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+        return (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
     }
 
-    public static TransitioningEntryParser create() {
-        return new TransitioningEntryParser();
+    public static EntryParser.Factory<TransitioningEntryParser> createFactory() {
+        return new Factory();
     }
 
-    public static TransitioningEntryParser createForIndentation(final int indentation) {
-        return new TransitioningEntryParser(indentation);
+    public static TransitioningEntryParser createParser(final int indentation) {
+        return createFactory().create(indentation);
+    }
+
+    public static class Factory implements EntryParser.Factory<TransitioningEntryParser> {
+        @Override
+        public TransitioningEntryParser create(final int indentation) {
+            return new TransitioningEntryParser(indentation);
+        }
     }
 }

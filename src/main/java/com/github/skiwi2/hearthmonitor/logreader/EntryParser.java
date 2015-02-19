@@ -29,4 +29,19 @@ public interface EntryParser {
      * @throws NotParsableException If this entry reader cannot parse the input to return a LogEntry.
      */
     LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException;
+
+    /**
+     * Factory class used to create parsers with a certain indentation level.
+     *
+     * @param <T>   The type of the EntryParser
+     */
+    interface Factory<T extends EntryParser> {
+        /**
+         * Creates a new EntryParser instance.
+         *
+         * @param indentation   The indentation level for which this EntryParser should work
+         * @return  The created EntryParser instance.
+         */
+        T create(final int indentation);
+    }
 }

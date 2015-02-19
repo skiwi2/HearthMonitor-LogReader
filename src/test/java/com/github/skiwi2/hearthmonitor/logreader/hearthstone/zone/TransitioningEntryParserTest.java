@@ -20,7 +20,7 @@ public class TransitioningEntryParserTest {
     @Test
     public void testTransitioning() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Transitioning.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TransitioningEntryParser.createForIndentation(0))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TransitioningEntryParser.createParser(0))))) {
             TransitioningLogEntry transitioningLogEntry = (TransitioningLogEntry)logReader.readNextEntry();
             CardEntityLogObject cardEntityLogObject = (CardEntityLogObject)transitioningLogEntry.getEntity();
 
@@ -38,7 +38,7 @@ public class TransitioningEntryParserTest {
     @Test
     public void testTransitioningIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Transitioning-indented.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TransitioningEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TransitioningEntryParser.createParser(4))))) {
             TransitioningLogEntry transitioningLogEntry = (TransitioningLogEntry)logReader.readNextEntry();
             CardEntityLogObject cardEntityLogObject = (CardEntityLogObject)transitioningLogEntry.getEntity();
 
@@ -56,7 +56,7 @@ public class TransitioningEntryParserTest {
     @Test(expected = NotReadableException.class)
     public void testTransitioningWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Transitioning.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TransitioningEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(TransitioningEntryParser.createParser(4))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
         }

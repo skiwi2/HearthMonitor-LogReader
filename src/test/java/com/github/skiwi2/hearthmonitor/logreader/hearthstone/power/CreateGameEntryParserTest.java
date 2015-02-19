@@ -16,14 +16,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class CreateGameEntryParserTest {
     @Test
     public void testCreateGame() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createForIndentation(0))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createParser(0))))) {
             CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readNextEntry();
 
             assertEquals(0, createGameLogEntry.getIndentation());
@@ -91,7 +90,7 @@ public class CreateGameEntryParserTest {
     @Test
     public void testCreateGameIndented() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame-indented.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createParser(4))))) {
             CreateGameLogEntry createGameLogEntry = (CreateGameLogEntry)logReader.readNextEntry();
 
             assertEquals(4, createGameLogEntry.getIndentation());
@@ -159,7 +158,7 @@ public class CreateGameEntryParserTest {
     @Test
     public void testCreateGameTwice() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame-twice.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createForIndentation(0))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createParser(0))))) {
             assertEquals(CreateGameLogEntry.class, logReader.readNextEntry().getClass());
             assertEquals(CreateGameLogEntry.class, logReader.readNextEntry().getClass());
         }
@@ -168,7 +167,7 @@ public class CreateGameEntryParserTest {
     @Test(expected = NotReadableException.class)
     public void testCreateGameWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("CreateGame.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(CreateGameEntryParser.createParser(4))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
         }

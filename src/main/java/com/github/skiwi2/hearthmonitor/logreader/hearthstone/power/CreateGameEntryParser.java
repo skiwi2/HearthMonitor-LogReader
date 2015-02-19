@@ -65,15 +65,9 @@ public class CreateGameEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() -         tag=NUM_TURNS_LEFT value=1
      */
 
-    private boolean restrictIndentation;
     private final int indentation;
 
-    private CreateGameEntryParser() {
-        this.indentation = 0;
-    }
-
     private CreateGameEntryParser(final int indentation) {
-        this.restrictIndentation = true;
         this.indentation = indentation;
     }
 
@@ -103,8 +97,8 @@ public class CreateGameEntryParser implements EntryParser {
             lineReader,
             line -> (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation),
             new HashSet<>(Arrays.asList(
-                (restrictIndentation) ? GameEntityEntryParser.createForIndentation(indentation + 4) : GameEntityEntryParser.create(),
-                (restrictIndentation) ? PlayerEntryParser.createForIndentation(indentation + 4) : PlayerEntryParser.create()
+                GameEntityEntryParser.createParser(indentation + 4),
+                PlayerEntryParser.createParser(indentation + 4)
             ))
         );
 
@@ -133,14 +127,21 @@ public class CreateGameEntryParser implements EntryParser {
     }
 
     private boolean isValidIndentation(final String input) {
-        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+        return (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
     }
 
-    public static CreateGameEntryParser create() {
-        return new CreateGameEntryParser();
+    public static EntryParser.Factory<CreateGameEntryParser> createFactory() {
+        return new Factory();
     }
 
-    public static CreateGameEntryParser createForIndentation(final int indentation) {
-        return new CreateGameEntryParser(indentation);
+    public static CreateGameEntryParser createParser(final int indentation) {
+        return createFactory().create(indentation);
+    }
+
+    public static class Factory implements EntryParser.Factory<CreateGameEntryParser> {
+        @Override
+        public CreateGameEntryParser create(final int indentation) {
+            return new CreateGameEntryParser(indentation);
+        }
     }
 }

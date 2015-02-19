@@ -19,7 +19,7 @@ public class PlayerEntryParserTest {
     @Test
     public void testPlayer() throws Exception {
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Player.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(PlayerEntryParser.createForIndentation(4))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(PlayerEntryParser.createParser(4))))) {
             PlayerLogEntry playerLogEntry = (PlayerLogEntry)logReader.readNextEntry();
 
             assertEquals(4, playerLogEntry.getIndentation());
@@ -49,7 +49,7 @@ public class PlayerEntryParserTest {
     @Test(expected = NotReadableException.class)
     public void testPlayerWrongIndentationLevel() throws Exception{
         BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(getClass().getResource("Player.log").toURI()), StandardCharsets.UTF_8);
-        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(PlayerEntryParser.createForIndentation(0))))) {
+        try (CloseableLogReader logReader = new FileLogReader(bufferedReader, new HashSet<>(Arrays.asList(PlayerEntryParser.createParser(0))))) {
             assertNotNull(logReader);
             logReader.readNextEntry();
         }

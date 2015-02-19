@@ -28,15 +28,9 @@ public class GameEntityEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() -         tag=STATE value=RUNNING
      */
 
-    private boolean restrictIndentation;
     private final int indentation;
 
-    private GameEntityEntryParser() {
-        this.indentation = 0;
-    }
-
     private GameEntityEntryParser(final int indentation) {
-        this.restrictIndentation = true;
         this.indentation = indentation;
     }
 
@@ -106,14 +100,21 @@ public class GameEntityEntryParser implements EntryParser {
     }
 
     private boolean isValidIndentation(final String input) {
-        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+        return (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
     }
 
-    public static GameEntityEntryParser create() {
-        return new GameEntityEntryParser();
+    public static EntryParser.Factory<GameEntityEntryParser> createFactory() {
+        return new Factory();
     }
 
-    public static GameEntityEntryParser createForIndentation(final int indentation) {
-        return new GameEntityEntryParser(indentation);
+    public static GameEntityEntryParser createParser(final int indentation) {
+        return createFactory().create(indentation);
+    }
+
+    public static class Factory implements EntryParser.Factory<GameEntityEntryParser> {
+        @Override
+        public GameEntityEntryParser create(final int indentation) {
+            return new GameEntityEntryParser(indentation);
+        }
     }
 }

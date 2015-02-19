@@ -21,15 +21,9 @@ public class TagChangeEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() - TAG_CHANGE Entity=skiwi tag=TIMEOUT value=75
      */
 
-    private boolean restrictIndentation;
     private final int indentation;
 
-    private TagChangeEntryParser() {
-        this.indentation = 0;
-    }
-
     private TagChangeEntryParser(final int indentation) {
-        this.restrictIndentation = true;
         this.indentation = indentation;
     }
 
@@ -85,14 +79,21 @@ public class TagChangeEntryParser implements EntryParser {
     }
 
     private boolean isValidIndentation(final String input) {
-        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+        return (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
     }
 
-    public static TagChangeEntryParser create() {
-        return new TagChangeEntryParser();
+    public static EntryParser.Factory<TagChangeEntryParser> createFactory() {
+        return new Factory();
     }
 
-    public static TagChangeEntryParser createForIndentation(final int indentation) {
-        return new TagChangeEntryParser(indentation);
+    public static TagChangeEntryParser createParser(final int indentation) {
+        return createFactory().create(indentation);
+    }
+
+    public static class Factory implements EntryParser.Factory<TagChangeEntryParser> {
+        @Override
+        public TagChangeEntryParser create(final int indentation) {
+            return new TagChangeEntryParser(indentation);
+        }
     }
 }

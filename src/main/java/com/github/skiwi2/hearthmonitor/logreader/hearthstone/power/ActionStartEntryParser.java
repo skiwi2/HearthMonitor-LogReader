@@ -11,8 +11,6 @@ import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
 import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.LogLineUtils;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -54,21 +52,13 @@ public class ActionStartEntryParser implements EntryParser {
      * [Power] GameState.DebugPrintPower() - ACTION_END
      */
 
-    private boolean restrictIndentation;
     private final int indentation;
-    private final Set<EntryParser> entryParsers;
+    private final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories;
 
-    private ActionStartEntryParser(final Set<EntryParser> entryParsers) {
-        Objects.requireNonNull(entryParsers, "entryParsers");
-        this.indentation = 0;
-        this.entryParsers = new HashSet<>(entryParsers);
-    }
-
-    private ActionStartEntryParser(final int indentation, final Set<EntryParser> entryParsers) {
-        Objects.requireNonNull(entryParsers, "entryParsers");
-        this.restrictIndentation = true;
+    private ActionStartEntryParser(final int indentation, final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories) {
+        Objects.requireNonNull(entryParserFactories, "entryParserFactories");
         this.indentation = indentation;
-        this.entryParsers = new HashSet<>(entryParsers);
+        this.entryParserFactories = new HashSet<>(entryParserFactories);
     }
 
     /**
@@ -99,42 +89,16 @@ public class ActionStartEntryParser implements EntryParser {
             throw new NotParsableException();
         }
 
-        //TODO clean this up
-        Set<EntryParser> innerEntryParsers;
-        try {
-            innerEntryParsers = entryParsers.stream()
-                .map(Object::getClass)
-                .map(clazz -> {
-                    try {
-                        if (restrictIndentation) {
-                            if (clazz.equals(ActionStartEntryParser.class)) {
-                                Method method = clazz.getDeclaredMethod("createForIndentation", int.class, Set.class);
-                                return (EntryParser)method.invoke(null, indentation + 4, entryParsers);
-                            }
-                            Method method = clazz.getDeclaredMethod("createForIndentation", int.class);
-                            return (EntryParser)method.invoke(null, indentation + 4);
-                        }
-                        if (clazz.equals(ActionStartEntryParser.class)) {
-                            Method method = clazz.getDeclaredMethod("create", Set.class);
-                            return (EntryParser)method.invoke(null, entryParsers);
-                        }
-                        Method method = clazz.getDeclaredMethod("create");
-                        return (EntryParser)method.invoke(null);
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                })
-                .collect(Collectors.toSet());
-        } catch (RuntimeException ex) {
-            throw new NotParsableException(ex);
-        }
+        Set<EntryParser> entryParsers = entryParserFactories.stream()
+            .map(factory -> factory.create(indentation + 4))
+            .collect(Collectors.<EntryParser>toSet());
 
         //construct a log reader from the line reader
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader(
             lineReader.readNextLine(),
             lineReader,
             line -> (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation),
-            innerEntryParsers
+            entryParsers
         );
 
         try {
@@ -184,14 +148,27 @@ public class ActionStartEntryParser implements EntryParser {
     }
 
     private boolean isValidIndentation(final String input) {
-        return (!restrictIndentation || LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
+        return (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
     }
 
-    public static ActionStartEntryParser create(final Set<EntryParser> entryParsers) {
-        return new ActionStartEntryParser(entryParsers);
+    public static EntryParser.Factory<ActionStartEntryParser> createFactory(final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories) {
+        return new Factory(entryParserFactories);
     }
 
-    public static ActionStartEntryParser createForIndentation(final int indentation, final Set<EntryParser> entryParsers) {
-        return new ActionStartEntryParser(indentation, entryParsers);
+    public static ActionStartEntryParser createParser(final int indentation, final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories) {
+        return createFactory(entryParserFactories).create(indentation);
+    }
+
+    public static class Factory implements EntryParser.Factory<ActionStartEntryParser> {
+        private final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories;
+
+        public Factory(final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories) {
+            this.entryParserFactories = entryParserFactories;
+        }
+
+        @Override
+        public ActionStartEntryParser create(final int indentation) {
+            return new ActionStartEntryParser(indentation, entryParserFactories);
+        }
     }
 }
