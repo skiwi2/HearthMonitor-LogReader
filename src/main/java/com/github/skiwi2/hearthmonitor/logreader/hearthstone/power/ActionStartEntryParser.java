@@ -11,6 +11,7 @@ import com.github.skiwi2.hearthmonitor.logreader.NotParsableException;
 import com.github.skiwi2.hearthmonitor.logreader.NotReadableException;
 import com.github.skiwi2.hearthmonitor.logreader.hearthstone.LogLineUtils;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -53,12 +54,12 @@ public class ActionStartEntryParser implements EntryParser {
      */
 
     private final int indentation;
-    private final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories;
+    private final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories;
 
-    private ActionStartEntryParser(final int indentation, final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories) {
-        Objects.requireNonNull(entryParserFactories, "entryParserFactories");
+    private ActionStartEntryParser(final int indentation, final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories) {
+        Objects.requireNonNull(otherEntryParserFactories, "otherEntryParserFactories");
         this.indentation = indentation;
-        this.entryParserFactories = new HashSet<>(entryParserFactories);
+        this.otherEntryParserFactories = new HashSet<>(otherEntryParserFactories);
     }
 
     /**
@@ -86,16 +87,20 @@ public class ActionStartEntryParser implements EntryParser {
     @Override
     public LogEntry parse(final String input, final LineReader lineReader) throws NotParsableException {
         if (!isValidIndentation(input)) {
-            throw new NotParsableException();
+            throw new NotParsableException(input);
         }
 
-        Set<EntryParser> entryParsers = entryParserFactories.stream()
+        Set<EntryParser> entryParsers = otherEntryParserFactories.stream()
             .map(factory -> factory.create(indentation + 4))
             .collect(Collectors.<EntryParser>toSet());
 
+        //add itself
+        entryParsers.add(new Factory(otherEntryParserFactories).create(indentation + 4));
+
         //construct a log reader from the line reader
+        String nextInput = lineReader.readNextLine();
         LogReader logReader = LogReaderUtils.fromInputAndExtraLineReader(
-            lineReader.readNextLine(),
+            nextInput,
             lineReader,
             line -> (LogLineUtils.isFromNamedLogger(line) && LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(line)) > indentation),
             entryParsers
@@ -137,8 +142,17 @@ public class ActionStartEntryParser implements EntryParser {
             builder.index(indexLogObject);
             builder.target(targetLogObject);
 
+            if (nextInput.equals("[Power] GameState.DebugPrintPower() - " + String.join("", Collections.nCopies(indentation, " ")) + "ACTION_END")) {
+                //return early if no more sub log entries have been found
+                return builder.build();
+            }
+
             while (logReader.hasNextEntry()) {
                 builder.addLogEntry(logReader.readNextEntry());
+            }
+
+            if (lineReader.nextLineMatches(line -> line.equals("[Power] GameState.DebugPrintPower() - " + String.join("", Collections.nCopies(indentation, " ")) + "ACTION_END"))) {
+                lineReader.readNextLine();
             }
 
             return builder.build();
@@ -160,15 +174,15 @@ public class ActionStartEntryParser implements EntryParser {
     }
 
     public static class Factory implements EntryParser.Factory<ActionStartEntryParser> {
-        private final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories;
+        private final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories;
 
-        public Factory(final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories) {
-            this.entryParserFactories = entryParserFactories;
+        public Factory(final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories) {
+            this.otherEntryParserFactories = otherEntryParserFactories;
         }
 
         @Override
         public ActionStartEntryParser create(final int indentation) {
-            return new ActionStartEntryParser(indentation, entryParserFactories);
+            return new ActionStartEntryParser(indentation, otherEntryParserFactories);
         }
     }
 }

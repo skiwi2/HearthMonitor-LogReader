@@ -1,0 +1,51 @@
+[Power] GameState.DebugPrintPower() - ACTION_START Entity=[id=42 cardId= type=INVALID zone=HAND zonePos=4 player=2] SubType=PLAY Index=0 Target=0
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=clo tag=RESOURCES_USED value=7
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=clo tag=NUM_CARDS_PLAYED_THIS_TURN value=3
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[id=77 cardId= type=INVALID zone=HAND zonePos=5 player=2] tag=ZONE_POSITION value=4
+[Power] GameState.DebugPrintPower() -     SHOW_ENTITY - Updating Entity=[id=42 cardId= type=INVALID zone=HAND zonePos=4 player=2] CardID=CS2_027
+[Power] GameState.DebugPrintPower() -         tag=PREMIUM value=1
+[Power] GameState.DebugPrintPower() -         tag=COST value=1
+[Power] GameState.DebugPrintPower() -         tag=ZONE value=PLAY
+[Power] GameState.DebugPrintPower() -         tag=FACTION value=NEUTRAL
+[Power] GameState.DebugPrintPower() -         tag=CARDTYPE value=ABILITY
+[Power] GameState.DebugPrintPower() -         tag=RARITY value=COMMON
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[id=42 cardId= type=INVALID zone=HAND zonePos=4 player=2] tag=ZONE_POSITION value=0
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[id=42 cardId= type=INVALID zone=HAND zonePos=4 player=2] tag=JUST_PLAYED value=1
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=[name=Stonesplinter Trogg id=35 zone=PLAY zonePos=4 cardId=GVG_067 player=1] SubType=TRIGGER Index=0 Target=0
+[Power] GameState.DebugPrintPower() -     ACTION_END
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Stonesplinter Trogg id=35 zone=PLAY zonePos=4 cardId=GVG_067 player=1] tag=ATK value=5
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=[id=42 cardId= type=INVALID zone=HAND zonePos=4 player=2] SubType=POWER Index=-1 Target=0
+[Power] GameState.DebugPrintPower() -         FULL_ENTITY - Creating ID=78 CardID=CS2_mirror
+[Power] GameState.DebugPrintPower() -             tag=PREMIUM value=1
+[Power] GameState.DebugPrintPower() -             tag=EXHAUSTED value=1
+[Power] GameState.DebugPrintPower() -             tag=HEALTH value=2
+[Power] GameState.DebugPrintPower() -             tag=ZONE value=PLAY
+[Power] GameState.DebugPrintPower() -             tag=CONTROLLER value=2
+[Power] GameState.DebugPrintPower() -             tag=ENTITY_ID value=78
+[Power] GameState.DebugPrintPower() -             tag=TAUNT value=1
+[Power] GameState.DebugPrintPower() -             tag=FACTION value=NEUTRAL
+[Power] GameState.DebugPrintPower() -             tag=CARDTYPE value=MINION
+[Power] GameState.DebugPrintPower() -             tag=RARITY value=COMMON
+[Power] GameState.DebugPrintPower() -             tag=ZONE_POSITION value=1
+[Power] GameState.DebugPrintPower() -             tag=CREATOR value=42
+[Power] GameState.DebugPrintPower() -         FULL_ENTITY - Creating ID=79 CardID=CS2_mirror
+[Power] GameState.DebugPrintPower() -             tag=PREMIUM value=1
+[Power] GameState.DebugPrintPower() -             tag=EXHAUSTED value=1
+[Power] GameState.DebugPrintPower() -             tag=HEALTH value=2
+[Power] GameState.DebugPrintPower() -             tag=ZONE value=PLAY
+[Power] GameState.DebugPrintPower() -             tag=CONTROLLER value=2
+[Power] GameState.DebugPrintPower() -             tag=ENTITY_ID value=79
+[Power] GameState.DebugPrintPower() -             tag=TAUNT value=1
+[Power] GameState.DebugPrintPower() -             tag=FACTION value=NEUTRAL
+[Power] GameState.DebugPrintPower() -             tag=CARDTYPE value=MINION
+[Power] GameState.DebugPrintPower() -             tag=RARITY value=COMMON
+[Power] GameState.DebugPrintPower() -             tag=ZONE_POSITION value=2
+[Power] GameState.DebugPrintPower() -             tag=CREATOR value=42
+[Power] GameState.DebugPrintPower() -     ACTION_END
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[id=42 cardId= type=INVALID zone=HAND zonePos=4 player=2] tag=ZONE value=GRAVEYARD
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=skiwi SubType=TRIGGER Index=-1 Target=0
+[Power] GameState.DebugPrintPower() -     ACTION_END
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=clo SubType=TRIGGER Index=-1 Target=0
+[Power] GameState.DebugPrintPower() -     ACTION_END
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=clo tag=NUM_OPTIONS_PLAYED_THIS_TURN value=3
+[Power] GameState.DebugPrintPower() - ACTION_END
