@@ -1,0 +1,51 @@
+[Power] GameState.DebugPrintPower() - ACTION_START Entity=[name=Fireblast id=5 zone=PLAY zonePos=0 cardId=CS2_034 player=1] SubType=PLAY Index=0 Target=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2]
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=skiwi tag=RESOURCES_USED value=2
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Fireblast id=5 zone=PLAY zonePos=0 cardId=CS2_034 player=1] tag=CARD_TARGET value=58
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=[name=Fireblast id=5 zone=PLAY zonePos=0 cardId=CS2_034 player=1] SubType=POWER Index=-1 Target=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2]
+[Power] GameState.DebugPrintPower() -         META_DATA - Meta=META_TARGET Data=0 Info=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=PREDAMAGE value=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=PREDAMAGE value=0
+[Power] GameState.DebugPrintPower() -         META_DATA - Meta=META_DAMAGE Data=1 Info=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=LAST_AFFECTED_BY value=5
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=DAMAGE value=7
+[Power] GameState.DebugPrintPower() -     ACTION_END
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Fireblast id=5 zone=PLAY zonePos=0 cardId=CS2_034 player=1] tag=EXHAUSTED value=1
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=GameEntity SubType=DEATHS Index=0 Target=0
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=Karotie tag=NUM_MINIONS_PLAYER_KILLED_THIS_TURN value=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=GameEntity tag=NUM_MINIONS_KILLED_THIS_TURN value=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=EXHAUSTED value=0
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Ironbeak Owl id=46 zone=PLAY zonePos=3 cardId=CS2_203 player=2] tag=ZONE_POSITION value=2
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=ZONE value=GRAVEYARD
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Strength of the Pack id=70 zone=PLAY zonePos=0 cardId=EX1_162o player=2] tag=ATTACHED value=0
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Strength of the Pack id=70 zone=PLAY zonePos=0 cardId=EX1_162o player=2] tag=ZONE value=REMOVEDFROMGAME
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=IGNORE_DAMAGE value=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=DAMAGE value=0
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=IGNORE_DAMAGE_OFF value=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=ATK value=1
+[Power] GameState.DebugPrintPower() -         TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=ZONE_POSITION value=0
+[Power] GameState.DebugPrintPower() -     ACTION_END
+[Power] GameState.DebugPrintPower() -     FULL_ENTITY - Creating ID=72 CardID=
+[Power] GameState.DebugPrintPower() -         tag=ZONE value=SETASIDE
+[Power] GameState.DebugPrintPower() -         tag=CONTROLLER value=2
+[Power] GameState.DebugPrintPower() -         tag=ENTITY_ID value=72
+[Power] GameState.DebugPrintPower() -         tag=ZONE_POSITION value=0
+[Power] GameState.DebugPrintPower() -         tag=CANT_PLAY value=0
+[Power] GameState.DebugPrintPower() -     SHOW_ENTITY - Updating Entity=72 CardID=EX1_162o
+[Power] GameState.DebugPrintPower() -         tag=ATTACHED value=46
+[Power] GameState.DebugPrintPower() -         tag=ZONE value=PLAY
+[Power] GameState.DebugPrintPower() -         tag=CARDTYPE value=ENCHANTMENT
+[Power] GameState.DebugPrintPower() -         tag=CREATOR value=55
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=72 tag=323 value=1
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Strength of the Pack id=70 zone=PLAY zonePos=0 cardId=EX1_162o player=2] tag=ZONE value=GRAVEYARD
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Strength of the Pack id=70 zone=PLAY zonePos=0 cardId=EX1_162o player=2] tag=323 value=0
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=72 tag=324 value=1
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Strength of the Pack id=70 zone=PLAY zonePos=0 cardId=EX1_162o player=2] tag=324 value=0
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Ironbeak Owl id=46 zone=PLAY zonePos=3 cardId=CS2_203 player=2] tag=ATK value=3
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=IGNORE_DAMAGE value=0
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=[name=Mogu'shan Warden id=58 zone=PLAY zonePos=2 cardId=EX1_396 player=2] tag=IGNORE_DAMAGE_OFF value=0
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=skiwi SubType=TRIGGER Index=-1 Target=0
+[Power] GameState.DebugPrintPower() -     ACTION_END
+[Power] GameState.DebugPrintPower() -     ACTION_START Entity=Karotie SubType=TRIGGER Index=-1 Target=0
+[Power] GameState.DebugPrintPower() -     ACTION_END
+[Power] GameState.DebugPrintPower() -     TAG_CHANGE Entity=skiwi tag=NUM_OPTIONS_PLAYED_THIS_TURN value=1
+[Power] GameState.DebugPrintPower() - ACTION_END

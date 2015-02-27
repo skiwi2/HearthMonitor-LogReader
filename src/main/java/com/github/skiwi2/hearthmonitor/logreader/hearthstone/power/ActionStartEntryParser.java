@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -55,11 +56,13 @@ public class ActionStartEntryParser implements EntryParser {
 
     private final int indentation;
     private final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories;
+    private final Consumer<? super NotReadableException> exceptionHandler;
 
-    private ActionStartEntryParser(final int indentation, final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories) {
+    private ActionStartEntryParser(final int indentation, final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories, final Consumer<? super NotReadableException> exceptionHandler) {
         Objects.requireNonNull(otherEntryParserFactories, "otherEntryParserFactories");
         this.indentation = indentation;
         this.otherEntryParserFactories = new HashSet<>(otherEntryParserFactories);
+        this.exceptionHandler = Objects.requireNonNull(exceptionHandler, "exceptionHandler");
     }
 
     /**
@@ -95,7 +98,7 @@ public class ActionStartEntryParser implements EntryParser {
             .collect(Collectors.<EntryParser>toSet());
 
         //add itself
-        entryParsers.add(new Factory(otherEntryParserFactories).create(indentation + 4));
+        entryParsers.add(new Factory(otherEntryParserFactories, exceptionHandler).create(indentation + 4));
 
         //construct a log reader from the line reader
         String nextInput = lineReader.readNextLine();
@@ -106,83 +109,85 @@ public class ActionStartEntryParser implements EntryParser {
             entryParsers
         );
 
-        try {
-            ActionStartLogEntry.Builder builder = new ActionStartLogEntry.Builder();
+        ActionStartLogEntry.Builder builder = new ActionStartLogEntry.Builder();
 
-            Matcher actionStartLogEntryMatcher = EXTRACT_ACTION_START_PATTERN.matcher(input);
-            if (!actionStartLogEntryMatcher.find()) {
-                throw new NotParsableException();
-            }
-            int localIndentation = actionStartLogEntryMatcher.group(1).length();
-            String entity = actionStartLogEntryMatcher.group(2);
-            String subtype = actionStartLogEntryMatcher.group(3);
-            String index = actionStartLogEntryMatcher.group(4);
-            String target = actionStartLogEntryMatcher.group(5);
-
-            EntityObjectParser entityObjectParser = new EntityObjectParser();
-
-            if (!entityObjectParser.isParsable(entity)) {
-                throw new NotParsableException();
-            }
-            EntityLogObject entityLogObject = (EntityLogObject)entityObjectParser.parse(entity);
-
-            if (!entityObjectParser.isParsable(index)) {
-                throw new NotParsableException();
-            }
-            EntityLogObject indexLogObject = (EntityLogObject)entityObjectParser.parse(index);
-
-            if (!entityObjectParser.isParsable(target)) {
-                throw new NotParsableException();
-            }
-            EntityLogObject targetLogObject = (EntityLogObject)entityObjectParser.parse(target);
-
-            builder.indentation(localIndentation);
-            builder.entity(entityLogObject);
-            builder.subtype(subtype);
-            builder.index(indexLogObject);
-            builder.target(targetLogObject);
-
-            if (nextInput.equals("[Power] GameState.DebugPrintPower() - " + String.join("", Collections.nCopies(indentation, " ")) + "ACTION_END")) {
-                //return early if no more sub log entries have been found
-                return builder.build();
-            }
-
-            while (logReader.hasNextEntry()) {
-                builder.addLogEntry(logReader.readNextEntry());
-            }
-
-            if (lineReader.nextLineMatches(line -> line.equals("[Power] GameState.DebugPrintPower() - " + String.join("", Collections.nCopies(indentation, " ")) + "ACTION_END"))) {
-                lineReader.readNextLine();
-            }
-
-            return builder.build();
-        } catch (NotReadableException ex) {
-            throw new NotParsableException(ex);
+        Matcher actionStartLogEntryMatcher = EXTRACT_ACTION_START_PATTERN.matcher(input);
+        if (!actionStartLogEntryMatcher.find()) {
+            throw new NotParsableException();
         }
+        int localIndentation = actionStartLogEntryMatcher.group(1).length();
+        String entity = actionStartLogEntryMatcher.group(2);
+        String subtype = actionStartLogEntryMatcher.group(3);
+        String index = actionStartLogEntryMatcher.group(4);
+        String target = actionStartLogEntryMatcher.group(5);
+
+        EntityObjectParser entityObjectParser = new EntityObjectParser();
+
+        if (!entityObjectParser.isParsable(entity)) {
+            throw new NotParsableException();
+        }
+        EntityLogObject entityLogObject = (EntityLogObject)entityObjectParser.parse(entity);
+
+        if (!entityObjectParser.isParsable(index)) {
+            throw new NotParsableException();
+        }
+        EntityLogObject indexLogObject = (EntityLogObject)entityObjectParser.parse(index);
+
+        if (!entityObjectParser.isParsable(target)) {
+            throw new NotParsableException();
+        }
+        EntityLogObject targetLogObject = (EntityLogObject)entityObjectParser.parse(target);
+
+        builder.indentation(localIndentation);
+        builder.entity(entityLogObject);
+        builder.subtype(subtype);
+        builder.index(indexLogObject);
+        builder.target(targetLogObject);
+
+        if (nextInput.equals("[Power] GameState.DebugPrintPower() - " + String.join("", Collections.nCopies(indentation, " ")) + "ACTION_END")) {
+            //return early if no more sub log entries have been found
+            return builder.build();
+        }
+
+        while (logReader.hasNextEntry()) {
+            try {
+                builder.addLogEntry(logReader.readNextEntry());
+            } catch (NotReadableException ex) {
+                exceptionHandler.accept(ex);
+            }
+        }
+
+        if (lineReader.nextLineMatches(line -> line.equals("[Power] GameState.DebugPrintPower() - " + String.join("", Collections.nCopies(indentation, " ")) + "ACTION_END"))) {
+            lineReader.readNextLine();
+        }
+
+        return builder.build();
     }
 
     private boolean isValidIndentation(final String input) {
         return (LogLineUtils.countLeadingSpaces(LogLineUtils.getContentFromLineFromNamedLogger(input)) == indentation);
     }
 
-    public static EntryParser.Factory<ActionStartEntryParser> createFactory(final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories) {
-        return new Factory(entryParserFactories);
+    public static EntryParser.Factory<ActionStartEntryParser> createFactory(final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories, final Consumer<? super NotReadableException> exceptionHandler) {
+        return new Factory(entryParserFactories, exceptionHandler);
     }
 
-    public static ActionStartEntryParser createParser(final int indentation, final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories) {
-        return createFactory(entryParserFactories).create(indentation);
+    public static ActionStartEntryParser createParser(final int indentation, final Set<? extends EntryParser.Factory<? extends EntryParser>> entryParserFactories, final Consumer<? super NotReadableException> exceptionHandler) {
+        return createFactory(entryParserFactories, exceptionHandler).create(indentation);
     }
 
     public static class Factory implements EntryParser.Factory<ActionStartEntryParser> {
         private final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories;
+        private final Consumer<? super NotReadableException> exceptionHandler;
 
-        public Factory(final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories) {
+        public Factory(final Set<? extends EntryParser.Factory<? extends EntryParser>> otherEntryParserFactories, final Consumer<? super NotReadableException> exceptionHandler) {
             this.otherEntryParserFactories = otherEntryParserFactories;
+            this.exceptionHandler = Objects.requireNonNull(exceptionHandler, "exceptionHandler");
         }
 
         @Override
         public ActionStartEntryParser create(final int indentation) {
-            return new ActionStartEntryParser(indentation, otherEntryParserFactories);
+            return new ActionStartEntryParser(indentation, otherEntryParserFactories, exceptionHandler);
         }
     }
 }
